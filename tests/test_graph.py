@@ -109,4 +109,3 @@ def test_vertex_order():
     vertex_order = [0, 1, 3, 2]
     vgfm = VertexGraphFrontierManager(raw_graph, vertex_order)
     assert vgfm.get_vertex_order() == vertex_order
-    import pdb; pdb.set_trace()
