@@ -25,11 +25,14 @@ PYBIND11_MODULE(_pyzdd, m) {
     PyDdStructure2.def(py::init<int, bool>(),
                        "Universe DD construction",
                        py::arg("n"), py::arg("useMP") = false);
+    PyDdStructure2.def(py::init<tdzdd::DdStructure<2> const &>()); // copy constructor
+    PyDdStructure2.def(py::self == py::self); // operator==
     PyDdStructure2.def("zddReduce", &tdzdd::DdStructure<2>::zddReduce);
     PyDdStructure2.def("size", &tdzdd::DdStructure<2>::size,
                        "get the number of non-terminal nodes");
     PyDdStructure2.def("cardinality", &tdzdd::DdStructure<2>::zddCardinality,
                        "count the number of sets in the family represented by this ZDD. Returned type is str because cardinality may be too enormous than int64.");
+
 
     // Set iterator
     using const_iterator = tdzdd::DdStructure<2>::const_iterator;
