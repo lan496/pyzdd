@@ -28,7 +28,19 @@ def convert_to_raw_graph(graph: nx.Graph) -> Union[List[List[Edge]], Dict[Any, i
     graph_pb = []
     for src in relabeled.nodes:
         # nx.Graph.neighbors is iterator on dict. the order of dict is fixed in python>=3.7.
-        edges_pb = [Edge(src, dst, relabeled[src][dst].get("weight", 1)) for dst in relabeled.neighbors(src)]
+        edges_pb = [
+            Edge(src, dst, relabeled[src][dst].get('weight', 1))
+            for dst in relabeled.neighbors(src)
+        ]
         graph_pb.append(edges_pb)
 
     return graph_pb, mapping
+
+
+def get_frontier_size(raw_graph: List[List[Edge]], vertex_order: List[int]):
+    """
+    return frontier size of DD for vertex-induced subgraphs
+    """
+    vgfm = VertexGraphFrontierManager(raw_graph, vertex_order)
+    frontier_size = vgfm.get_max_frontier_size()
+    return frontier_size

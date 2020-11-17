@@ -9,6 +9,9 @@ from pyzdd.graph import (
 from pyzdd.structure import (
     construct_derivative_structures_with_sro,
     enumerate_binary_labelings_with_graph,
+    prepare_derivative_structures_with_sro,
+    restrict_pair_correlation,
+    remove_superperiodic_structures,
 )
 
 
@@ -43,6 +46,15 @@ def test_sro():
         2,
     ]
 
+    count_expect = "1"
+    list_expect = [
+        [0, 0, 1, 1],
+    ]
+    expect = set()
+    for labeling in list_expect:
+        expect.add(tuple(labeling))
+
+    # check `construct_derivative_structures_with_sro`
     construct_derivative_structures_with_sro(
         dd,
         num_sites,
@@ -55,17 +67,41 @@ def test_sro():
         targets,
         remove_superperiodic=True,
     )
-    assert dd.cardinality() == "1"
-
+    assert dd.cardinality() == count_expect
     actual = set()
     for labeling in enumerate_binary_labelings_with_graph(dd, num_sites, vertex_order):
         actual.add(tuple(labeling))
+    assert actual == expect
 
-    list_expect = [
-        [0, 0, 1, 1],
-    ]
-    expect = set()
-    for labeling in list_expect:
-        expect.add(tuple(labeling))
+    # check combination of methods
+    dd2 = Universe()
+    prepare_derivative_structures_with_sro(
+        dd2,
+        num_sites,
+        num_types,
+        vertex_order,
+        automorphism,
+        composition_constraints,
+    )
+    for (graph, target) in zip(graphs, targets):
+        restrict_pair_correlation(
+            dd2,
+            num_sites,
+            num_types,
+            vertex_order,
+            graph,
+            target,
+        )
+    remove_superperiodic_structures(
+        dd2,
+        num_sites,
+        num_types,
+        vertex_order,
+        translations,
+    )
 
+    assert dd2.cardinality() == count_expect
+    actual = set()
+    for labeling in enumerate_binary_labelings_with_graph(dd2, num_sites, vertex_order):
+        actual.add(tuple(labeling))
     assert actual == expect

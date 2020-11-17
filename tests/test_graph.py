@@ -8,6 +8,7 @@ from pyzdd.graph import (
     GraphAuxiliary,
     VertexGraphFrontierManager,
     convert_to_raw_graph,
+    get_frontier_size,
 )
 
 
@@ -109,3 +110,17 @@ def test_vertex_order():
     vertex_order = [0, 1, 3, 2]
     vgfm = VertexGraphFrontierManager(raw_graph, vertex_order)
     assert vgfm.get_vertex_order() == vertex_order
+
+
+def test_frontier_size():
+    graph = nx.Graph()
+    graph.add_nodes_from([0, 1, 2, 3])
+    graph.add_edges_from([
+        (0, 1),
+        (0, 2),
+        (2, 3),
+        (1, 3),
+    ])
+    raw_graph, _ = convert_to_raw_graph(graph)
+    vertex_order = [0, 1, 3, 2]
+    assert get_frontier_size(raw_graph, vertex_order) == 3

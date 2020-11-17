@@ -116,9 +116,7 @@ PYBIND11_MODULE(_pyzdd, m) {
         py::arg("num_types"),
         py::arg("vertex_order"),
         py::arg("automorphism"),
-        py::arg("translations"),
-        py::arg("composition_constraints"),
-        py::arg("remove_superperiodic")
+        py::arg("composition_constraints")
     );
     m.def(
         "restrict_pair_correlation",
@@ -129,6 +127,15 @@ PYBIND11_MODULE(_pyzdd, m) {
         py::arg("vertex_order"),
         py::arg("graph"),
         py::arg("target")
+    );
+    m.def(
+        "remove_superperiodic_structures",
+        &pyzdd::derivative_structure::remove_superperiodic_structures,
+        py::arg("dd"),
+        py::arg("num_sites"),
+        py::arg("num_types"),
+        py::arg("vertex_order"),
+        py::arg("translations")
     );
     m.def(
         "construct_derivative_structures_with_sro",
