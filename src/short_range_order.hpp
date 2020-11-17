@@ -64,6 +64,47 @@ private:
     }
 };
 
+/// @brief enumerate DD for non-superperiodic derivative structures
+/// @param[out] dd DD for output
+/// @param[in] num_sites the number of sites in supercell
+/// @param[in] num_types the kinds of species
+/// @param[in] vertex_order
+/// @param[in] translations permutation group derived from
+////           translations of cell. Required if `remove_superperiodic` is true.
+void remove_superperiodic_structures(
+    tdzdd::DdStructure<2>& dd,
+    int num_sites,
+    int num_types,
+    const std::vector<graph::Vertex>& vertex_order,
+    const std::vector<permutation::Permutation>& translations
+)
+{
+    if (num_types == 2) {
+        int num_variables = num_sites;
+        BinaryVertexConverter converter(num_sites, vertex_order);
+
+        std::vector<permutation::Permutation> reordered_translation_group;
+        reordered_translation_group.reserve(translations.size());
+        for (const auto& perm: translations) {
+            auto reordered_perm = converter.reorder_premutation(perm);
+            reordered_translation_group.emplace_back(reordered_perm);
+        }
+
+        auto identity = permutation::get_identity(num_variables);
+        for (const auto& perm: reordered_translation_group) {
+            if (perm == identity) {
+                continue;
+            }
+            permutation::PermutationFrontierManager pfm(perm);
+            permutation::superperiodic::SuperperiodicElimination spec(pfm);
+            dd.zddSubset(spec);
+            dd.zddReduce();
+        }
+    } else {
+        std::cerr << "TODO: multicomponent system" << std::endl;
+        exit(1);
+    }
+}
 
 void prepare_binary_derivative_structures_with_sro_(
     tdzdd::DdStructure<2>& dd,
@@ -71,9 +112,7 @@ void prepare_binary_derivative_structures_with_sro_(
     int num_types,
     const std::vector<graph::Vertex>& vertex_order,
     const std::vector<permutation::Permutation>& automorphism,
-    const std::vector<permutation::Permutation>& translations,
-    const std::vector<std::pair<std::vector<int>, int>>& composition_constraints,
-    bool remove_superperiodic
+    const std::vector<std::pair<std::vector<int>, int>>& composition_constraints
 )
 {
     size_t num_variables = num_sites;
@@ -93,13 +132,6 @@ void prepare_binary_derivative_structures_with_sro_(
                     auto size_rhs = permutation::PermutationFrontierManager(rhs).get_max_frontier_size();
                     return size_lhs < size_rhs;
                 });
-
-    std::vector<permutation::Permutation> reordered_translation_group;
-    reordered_translation_group.reserve(translations.size());
-    for (const auto& perm: translations) {
-        auto reordered_perm = converter.reorder_premutation(perm);
-        reordered_translation_group.emplace_back(reordered_perm);
-    }
 
     // ======== construct DD ========
     dd = universe::Universe(num_variables);
@@ -127,42 +159,23 @@ void prepare_binary_derivative_structures_with_sro_(
         dd.zddSubset(spec);
         dd.zddReduce();
     }
-
-    // remove superperiodic
-    if (remove_superperiodic) {
-        auto identity = permutation::get_identity(num_variables);
-        for (const auto& perm: reordered_translation_group) {
-            if (perm == identity) {
-                continue;
-            }
-            permutation::PermutationFrontierManager pfm(perm);
-            permutation::superperiodic::SuperperiodicElimination spec(pfm);
-            dd.zddSubset(spec);
-            dd.zddReduce();
-        }
-    }
-
 }
 
 /// @brief enumerate DD for derivative structures with fixed short-range order (SRO)
 /// @param[out] dd DD for output
 /// @param[in] num_sites the number of sites in supercell
 /// @param[in] num_types the kinds of species
+/// @param[in] vertex_order
 /// @param[in] automorphism symmetry group of supercell
-/// @param[in] translations (Optional) permutation group derived from
-////           translations of cell. Required if `remove_superperiodic` is true.
 /// @param[in] composition_constraints composition_constraints[i]
 ///            is a pair of sites and a desired number of label=1
-/// @param[in] remove_superperiodic iff true, remove superperiodic structures
 void prepare_derivative_structures_with_sro(
     tdzdd::DdStructure<2>& dd,
     int num_sites,
     int num_types,
     const std::vector<graph::Vertex>& vertex_order,
     const std::vector<permutation::Permutation>& automorphism,
-    const std::vector<permutation::Permutation>& translations,
-    const std::vector<std::pair<std::vector<int>, int>>& composition_constraints,
-    bool remove_superperiodic
+    const std::vector<std::pair<std::vector<int>, int>>& composition_constraints
 )
 {
     // sanity check
@@ -174,17 +187,9 @@ void prepare_derivative_structures_with_sro(
             exit(1);
         }
     }
-    for (const auto& perm: translations) {
-        if (perm.get_size() != static_cast<size_t>(num_sites)) {
-            std::cerr << "The number of elements of permutation should be num_sites." << std::endl;
-            exit(1);
-        }
-    }
+
     // TODO: sanity check on composition_constraints
-    if (remove_superperiodic && translations.empty()) {
-        std::cerr << "Translational group is required for removing superperiodic structures.";
-        exit(1);
-    }
+
 
     tdzdd::MessageHandler::showMessages(true);
     if (num_types == 2) {
@@ -194,9 +199,7 @@ void prepare_derivative_structures_with_sro(
             num_types,
             vertex_order,
             automorphism,
-            translations,
-            composition_constraints,
-            remove_superperiodic
+            composition_constraints
         );
     } else {
         std::cerr << "TODO: multicomponent system" << std::endl;
@@ -210,6 +213,7 @@ void prepare_derivative_structures_with_sro(
 /// @param[out] dd DD for output
 /// @param[in] num_sites the number of sites in supercell
 /// @param[in] num_types the kinds of species
+/// @param[in] vertex_order
 /// @param[in] graph frontier manager of cluster graph
 /// @param[in] target target weight without loop offset of vertex-induced subgraph
 void restrict_pair_correlation(
@@ -261,6 +265,18 @@ void construct_derivative_structures_with_sro(
     bool remove_superperiodic
 )
 {
+    // sanity check
+    for (const auto& perm: translations) {
+        if (perm.get_size() != static_cast<size_t>(num_sites)) {
+            std::cerr << "The number of elements of permutation should be num_sites." << std::endl;
+            exit(1);
+        }
+    }
+    if (remove_superperiodic && translations.empty()) {
+        std::cerr << "Translational group is required for removing superperiodic structures.";
+        exit(1);
+    }
+
     // ==== construct DD ====
     prepare_derivative_structures_with_sro(
         dd,
@@ -268,9 +284,7 @@ void construct_derivative_structures_with_sro(
         num_types,
         vertex_order,
         automorphism,
-        translations,
-        composition_constraints,
-        remove_superperiodic
+        composition_constraints
     );
 
     // fix SRO
@@ -287,6 +301,11 @@ void construct_derivative_structures_with_sro(
             graphs[i],
             targets[i]
         );
+    }
+
+    // remove superperiodic
+    if (remove_superperiodic) {
+        remove_superperiodic_structures(dd, num_sites, num_types, vertex_order, translations);
     }
 }
 

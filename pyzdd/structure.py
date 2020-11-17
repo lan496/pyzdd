@@ -9,6 +9,9 @@ from _pyzdd import (
     construct_derivative_structures_with_sro,
     convert_to_labeling,
     convert_to_binary_labeling_with_graph,
+    prepare_derivative_structures_with_sro,
+    restrict_pair_correlation,
+    remove_superperiodic_structures,
 )
 
 
