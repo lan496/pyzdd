@@ -52,7 +52,7 @@ int main() {
 
     // full structures
     {
-        BinaryVertexConverter converter(num_sites, vertex_order);
+        VertexConverter converter(num_sites, vertex_order);
         std::vector<Permutation> automorphism_aug;
         for (const auto& perm: automorphism) {
             auto aug = converter.reorder_premutation(perm);

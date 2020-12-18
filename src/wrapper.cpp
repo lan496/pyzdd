@@ -155,7 +155,7 @@ PYBIND11_MODULE(_pyzdd, m) {
         py::arg("remove_superperiodic")
     );
     // converter
-    py::class_<pyzdd::derivative_structure::BinaryVertexConverter> (m, "BinaryVertexConverter")
+    py::class_<pyzdd::derivative_structure::VertexConverter> (m, "BinaryVertexConverter")
         .def(py::init<int, const std::vector<pyzdd::graph::Vertex>&>());
     m.def(
         "convert_to_binary_labeling_with_graph",
