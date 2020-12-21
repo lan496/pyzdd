@@ -180,7 +180,9 @@ void prepare_multicomponent_derivative_structures_with_sro_(
     // sanity check
     for (const auto& perm: automorphism) {
         if (perm.get_size() != static_cast<size_t>(num_variables)) {
-            std::cerr << "The number of elements of permutation should be num_variables." << std::endl;
+            std::cerr << "The number of elements of permutation should be num_variables:"
+                      << perm.get_size() << " "
+                      << static_cast<size_t>(num_variables) << std::endl;
             exit(1);
         }
     }
