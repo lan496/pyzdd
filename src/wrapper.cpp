@@ -119,7 +119,8 @@ PYBIND11_MODULE(_pyzdd, m) {
         py::arg("num_types"),
         py::arg("vertex_order"),
         py::arg("automorphism"),
-        py::arg("composition_constraints")
+        py::arg("composition_constraints"),
+        py::arg("useMP") = false
     );
     m.def(
         "restrict_pair_correlation",
@@ -152,7 +153,8 @@ PYBIND11_MODULE(_pyzdd, m) {
         py::arg("composition_constraints"),
         py::arg("graphs"),
         py::arg("targets"),
-        py::arg("remove_superperiodic")
+        py::arg("remove_superperiodic"),
+        py::arg("useMP") = false
     );
     // converter
     py::class_<pyzdd::derivative_structure::VertexConverter> (m, "BinaryVertexConverter")
