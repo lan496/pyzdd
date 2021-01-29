@@ -91,7 +91,8 @@ void test_binary() {
             composition_constraints,
             graphs,
             targets,
-            true  // remove superperiodic
+            true,  // remove superperiodic
+            false  // not useMP
         );
 
         std::string cardinality_expect = "1";
@@ -200,7 +201,8 @@ void test_multi() {
         composition_constraints,
         cluster_graphs,
         targets,
-        true  // remove superperiodic
+        true,  // remove superperiodic
+        false
     );
 
     // return labelings
