@@ -13,10 +13,12 @@
 #include "short_range_order.hpp"
 #include "utils.hpp"
 #include "structure_enumeration.hpp"
+#include "spec/combination.hpp"
 
 using namespace pyzdd;
 using namespace pyzdd::permutation;
 using namespace pyzdd::graph;
+using namespace pyzdd::combination;
 using namespace pyzdd::derivative_structure;
 
 int main() {
@@ -43,11 +45,15 @@ int main() {
     add_undirected_edge(cluster_graph, 3, 4, 1);
     add_undirected_edge(cluster_graph, 3, 5, 1);
     add_undirected_edge(cluster_graph, 4, 5, 1);
-    auto vertex_order = get_vertex_order_by_bfs(cluster_graph);
+
+    // not use BFS
+    // auto vertex_order = get_vertex_order_by_bfs(cluster_graph);
+    std::vector<Vertex> vertex_order = {0, 1, 2, 3, 4, 5};
     for (auto v: vertex_order) {
         std::cerr << " " << v;
     }
     std::cerr << std::endl;
+
     int target = 3;
 
     // full structures
@@ -73,8 +79,17 @@ int main() {
             false  // superperiodic
         );
 
-        std::ofstream os("full.dot");
+        std::ofstream os("full.raw.dot");
         dd0.dumpDot(os);
+    }
+
+    // AB composition with duplicates
+    {
+        Combination spec(6, 3);
+        tdzdd::DdStructure<2> dd(spec);
+        dd.zddReduce();
+        std::ofstream os("AB_duplicates.raw.dot");
+        dd.dumpDot(os);
     }
 
     // composition constraints
@@ -89,9 +104,10 @@ int main() {
         num_types,
         vertex_order,
         automorphism,
-        composition_constraints
+        composition_constraints,
+        false
     );
-    std::ofstream os1("AB.dot");
+    std::ofstream os1("AB.raw.dot");
     dd.dumpDot(os1);
 
     pyzdd::derivative_structure::restrict_pair_correlation(
@@ -102,7 +118,7 @@ int main() {
         cluster_graph,
         target
     );
-    std::ofstream os2("AB_1stNN.dot");
+    std::ofstream os2("AB_1stNN.raw.dot");
     dd.dumpDot(os2);
 
     return 0;
