@@ -25,11 +25,14 @@ PYBIND11_MODULE(_pyzdd, m) {
     PyDdStructure2.def(py::init<int, bool>(),
                        "Universe DD construction",
                        py::arg("n"), py::arg("useMP") = false);
+    PyDdStructure2.def(py::init<tdzdd::DdStructure<2> const &>()); // copy constructor
+    PyDdStructure2.def(py::self == py::self); // operator==
     PyDdStructure2.def("zddReduce", &tdzdd::DdStructure<2>::zddReduce);
     PyDdStructure2.def("size", &tdzdd::DdStructure<2>::size,
                        "get the number of non-terminal nodes");
     PyDdStructure2.def("cardinality", &tdzdd::DdStructure<2>::zddCardinality,
                        "count the number of sets in the family represented by this ZDD. Returned type is str because cardinality may be too enormous than int64.");
+
 
     // Set iterator
     using const_iterator = tdzdd::DdStructure<2>::const_iterator;
@@ -116,7 +119,8 @@ PYBIND11_MODULE(_pyzdd, m) {
         py::arg("num_types"),
         py::arg("vertex_order"),
         py::arg("automorphism"),
-        py::arg("composition_constraints")
+        py::arg("composition_constraints"),
+        py::arg("useMP") = false
     );
     m.def(
         "restrict_pair_correlation",
@@ -149,10 +153,11 @@ PYBIND11_MODULE(_pyzdd, m) {
         py::arg("composition_constraints"),
         py::arg("graphs"),
         py::arg("targets"),
-        py::arg("remove_superperiodic")
+        py::arg("remove_superperiodic"),
+        py::arg("useMP") = false
     );
     // converter
-    py::class_<pyzdd::derivative_structure::BinaryVertexConverter> (m, "BinaryVertexConverter")
+    py::class_<pyzdd::derivative_structure::VertexConverter> (m, "BinaryVertexConverter")
         .def(py::init<int, const std::vector<pyzdd::graph::Vertex>&>());
     m.def(
         "convert_to_binary_labeling_with_graph",

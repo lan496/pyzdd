@@ -1,29 +1,52 @@
 # pyzdd
+[![testing](https://github.com/lan496/pyzdd/actions/workflows/ci.yml/badge.svg)](https://github.com/lan496/pyzdd/actions/workflows/ci.yml)
+[![pre-commit.ci status](https://results.pre-commit.ci/badge/github/lan496/pyzdd/main.svg?badge_token=MU26PgVHQe-LRTPsqN6olg)](https://results.pre-commit.ci/latest/github/lan496/pyzdd/main?badge_token=MU26PgVHQe-LRTPsqN6olg)
+[![MIT License](http://img.shields.io/badge/license-MIT-blue.svg?style=flat)](LICENSE)
+
 Python wrapper to TdZdd
 
 ## Installation
 
-```script
+```shell
 git clone --recursive git@github.com:lan496/pyzdd.git
+cd pyzdd
+pip install -e .
 ```
 
-### Conda
+## How to cite pyzdd
+
+If you use this package in your research, please cite TdZDD as follows.
+
 ```
-conda create --name pyzdd python=3.8 pip
-conda activate pyzdd
-pip install -r requirements.txt
-pip install -e .
+@techreport{Iwashita13,
+  author = {Hiroaki Iwashita and Shinichi Minato},
+  memo = {Efficient Top-Down {ZDD} Construction Techniques Using Recursive Specifications},
+  year = {2013},
+  number = {TCS-TRA-1369,
+  INSTITUTION = {Graduate School of Information Science and Technology, Hokkaido University}
+}
+```
+
+The citation for the isomorphism-elimination DD is as follows.
+
+```
+@inproceedings{Horiyama2018,
+  memo ={Isomorphism Elimination by Zero-Suppressed Binary Decision Diagrams},
+  author={Takashi Horiyama and Masahiro Miyasaka and Riku Sasaki},
+  booktitle={the Canadian Conference on Computational Geometry},
+  pages={360--366},
+  address={Winnipeg, Manitoba, Canada}
+  year={2018},
+  url={http://www.cs.umanitoba.ca/~cccg2018/papers/session7B-p2.pdf}
+}
 ```
 
 ## Development
 
 ### Installation
-```
-conda create --name pyzdd python=3.8 pip
-pyenv activate pyzdd
-pip install -r requirements.txt
-pip install -r requirements-dev.txt
-./clean.sh && pip install -e .
+
+```shell
+./clean.sh && pip install -e ".[dev]"
 pre-commit install
 ```
 

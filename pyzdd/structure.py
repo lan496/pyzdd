@@ -59,7 +59,10 @@ def enumerate_binary_labelings_with_graph(dd: Universe, num_sites: int, vertex_o
 
     itr = dd.begin()
     end = dd.end()
-    converter = BinaryVertexConverter(num_sites, vertex_order)
+
+    num_variables = len(vertex_order)
+
+    converter = BinaryVertexConverter(num_variables, vertex_order)
     while itr != end:
         labeling = convert_to_binary_labeling_with_graph(itr, converter)
         yield labeling

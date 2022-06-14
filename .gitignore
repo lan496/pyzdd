@@ -177,3 +177,9 @@ pip-wheel-metadata/
 Elimination.hpp
 *.dot
 *.png
+*.pdf
+*.tex
+*.aux
+
+.vscode/
+src/example/*

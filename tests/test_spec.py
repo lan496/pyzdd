@@ -60,3 +60,15 @@ def test_choice():
     count_expect = factorial(len(v)) // factorial(k) // factorial(len(v) - k) * (2 ** (n - len(v)))
     assert count == count_expect
     assert universe.cardinality() == str(count_expect)
+
+
+def test_dd_copy():
+    n = 10
+    k = 4
+    spec = Combination(n, k)
+    dd = Universe(n)
+    dd.zddSubset(spec)
+    dd.zddReduce()
+
+    dd2 = Universe(dd)
+    assert dd2 == dd

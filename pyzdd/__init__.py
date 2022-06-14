@@ -9,11 +9,7 @@ from _pyzdd import (
     variable_choice,
 )
 from pyzdd.graph import Graph
-from ._version import get_versions  # type: ignore
-
-
-__version__ = get_versions()["version"]
-del get_versions
+from pyzdd._version import __version__
 
 
 def enumerate_sets(universe: Universe, n: int) -> Generator[Set[int], None, None]:
