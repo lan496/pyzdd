@@ -182,3 +182,4 @@ Elimination.hpp
 *.aux
 
 .vscode/
+src/example/*
