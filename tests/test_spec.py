@@ -1,6 +1,6 @@
 from math import factorial
 
-from pyzdd import Universe, Combination, Choice, enumerate_sets
+from pyzdd import Choice, Combination, Universe, enumerate_sets
 
 
 def test_combination():
@@ -10,7 +10,6 @@ def test_combination():
     universe = Universe(n)
     universe.zddSubset(spec)
     universe.zddReduce()
-    size = universe.size()
 
     # test items
     count = 0

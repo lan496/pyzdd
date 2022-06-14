@@ -1,18 +1,18 @@
 from typing import Generator, List
 
-from pyzdd import Universe
-from pyzdd.graph import Graph, get_vertex_order_by_bfs
-
 from _pyzdd import (
     BinaryVertexConverter,
     construct_derivative_structures,
     construct_derivative_structures_with_sro,
-    convert_to_labeling,
     convert_to_binary_labeling_with_graph,
+    convert_to_labeling,
     prepare_derivative_structures_with_sro,
-    restrict_pair_correlation,
     remove_superperiodic_structures,
+    restrict_pair_correlation,
 )
+
+from pyzdd import Universe
+from pyzdd.graph import Graph, get_vertex_order_by_bfs
 
 
 def enumerate_labelings(dd: Universe, num_sites, num_types) -> Generator[List[int], None, None]:
@@ -40,7 +40,9 @@ def enumerate_labelings(dd: Universe, num_sites, num_types) -> Generator[List[in
         itr.next()
 
 
-def enumerate_binary_labelings_with_graph(dd: Universe, num_sites: int, vertex_order: List[int]) -> Generator[List[int], None, None]:
+def enumerate_binary_labelings_with_graph(
+    dd: Universe, num_sites: int, vertex_order: List[int]
+) -> Generator[List[int], None, None]:
     """
     yield labeling of derivative structure with a cluster graph
 

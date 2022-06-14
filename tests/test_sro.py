@@ -1,17 +1,13 @@
 import networkx as nx
 
-from pyzdd import Universe, Permutation, generate_permutation_group
-from pyzdd.graph import (
-    Graph,
-    convert_to_raw_graph,
-    get_vertex_order_by_bfs,
-)
+from pyzdd import Permutation, Universe, generate_permutation_group
+from pyzdd.graph import Graph, convert_to_raw_graph, get_vertex_order_by_bfs
 from pyzdd.structure import (
     construct_derivative_structures_with_sro,
     enumerate_binary_labelings_with_graph,
     prepare_derivative_structures_with_sro,
-    restrict_pair_correlation,
     remove_superperiodic_structures,
+    restrict_pair_correlation,
 )
 
 
@@ -31,12 +27,14 @@ def test_sro():
 
     cluster_graph = nx.Graph()
     cluster_graph.add_nodes_from([0, 1, 2, 3])
-    cluster_graph.add_weighted_edges_from([
-        (0, 1, 2),
-        (1, 2, 2),
-        (2, 3, 2),
-        (3, 0, 2),
-    ])
+    cluster_graph.add_weighted_edges_from(
+        [
+            (0, 1, 2),
+            (1, 2, 2),
+            (2, 3, 2),
+            (3, 0, 2),
+        ]
+    )
     raw_graph, _ = convert_to_raw_graph(cluster_graph)
     vertex_order = get_vertex_order_by_bfs(raw_graph)
     graphs = [

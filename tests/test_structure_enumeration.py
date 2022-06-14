@@ -1,8 +1,4 @@
-from pyzdd import (
-    Universe,
-    Permutation,
-    generate_permutation_group,
-)
+from pyzdd import Permutation, Universe, generate_permutation_group
 from pyzdd.structure import construct_derivative_structures, enumerate_labelings
 
 
@@ -31,7 +27,7 @@ def test_structure_enumeration():
         [1, 1, 1, 0],
         [1, 1, 0, 0],
         [1, 0, 1, 0],
-        [1, 0 ,0, 0],
+        [1, 0, 0, 0],
         #
         [2, 2, 2, 0],
         [2, 2, 0, 0],
@@ -59,12 +55,7 @@ def test_structure_enumeration():
     # remove superperiodic structures
     dd = Universe()
     construct_derivative_structures(
-        dd,
-        num_sites,
-        num_types,
-        automorphism,
-        translations,
-        remove_superperiodic=True
+        dd, num_sites, num_types, automorphism, translations, remove_superperiodic=True
     )
     assert dd.cardinality() == "15"
 
@@ -75,7 +66,7 @@ def test_structure_enumeration():
     list_expect = [
         [1, 1, 1, 0],
         [1, 1, 0, 0],
-        [1, 0 ,0, 0],
+        [1, 0, 0, 0],
         #
         [2, 2, 2, 0],
         [2, 2, 0, 0],

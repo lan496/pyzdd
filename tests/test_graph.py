@@ -1,8 +1,8 @@
 from typing import List, Set
 
 import networkx as nx
+from networkx import complete_graph, path_graph
 from networkx.generators.lattice import grid_graph
-from networkx import path_graph, complete_graph
 
 from pyzdd.graph import (
     GraphAuxiliary,
@@ -100,12 +100,14 @@ def test_vertex_order():
     """
     graph = nx.Graph()
     graph.add_nodes_from([0, 1, 2, 3])
-    graph.add_edges_from([
-        (0, 1),
-        (0, 2),
-        (2, 3),
-        (1, 3),
-    ])
+    graph.add_edges_from(
+        [
+            (0, 1),
+            (0, 2),
+            (2, 3),
+            (1, 3),
+        ]
+    )
     raw_graph, _ = convert_to_raw_graph(graph)
     vertex_order = [0, 1, 3, 2]
     vgfm = VertexGraphFrontierManager(raw_graph, vertex_order)
@@ -115,12 +117,14 @@ def test_vertex_order():
 def test_frontier_size():
     graph = nx.Graph()
     graph.add_nodes_from([0, 1, 2, 3])
-    graph.add_edges_from([
-        (0, 1),
-        (0, 2),
-        (2, 3),
-        (1, 3),
-    ])
+    graph.add_edges_from(
+        [
+            (0, 1),
+            (0, 2),
+            (2, 3),
+            (1, 3),
+        ]
+    )
     raw_graph, _ = convert_to_raw_graph(graph)
     vertex_order = [0, 1, 3, 2]
     assert get_frontier_size(raw_graph, vertex_order) == 3

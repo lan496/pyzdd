@@ -1,15 +1,16 @@
-from typing import Generator, Set, List
+from typing import Generator, List, Set
 
 from _pyzdd import (
-    Universe,
-    Combination,
     Choice,
+    Combination,
     Permutation,
+    Universe,
     generate_permutation_group,
     variable_choice,
 )
-from pyzdd.graph import Graph
+
 from pyzdd._version import __version__
+from pyzdd.graph import Graph
 
 
 def enumerate_sets(universe: Universe, n: int) -> Generator[Set[int], None, None]:
