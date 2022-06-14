@@ -114,12 +114,15 @@ setup(
     ],
     extras_require={
         "dev": [
-            "pybind11==2.9.1",
             "pre-commit",
             "black",
             "versioneer",
             "pytest",
             "pytest-cov",
+            "flake8",
+            "mypy",
+            "isort",
+            "pyupgrade",
         ],
     },
     test_requires=["pytest"],
