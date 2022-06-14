@@ -1,10 +1,14 @@
+from pathlib import Path
 from os.path import splitext, basename
 import setuptools
 from setuptools import setup, Extension, find_packages
 from setuptools.command.build_ext import build_ext
 import sys
 from glob import glob
-import versioneer
+
+
+with open(Path(__file__).resolve().parent / "README.md") as f:
+    long_description = "\n" + f.read()
 
 
 ext_modules = [
@@ -92,20 +96,49 @@ class BuildExt(build_ext):
 
 setup(
     name='pyzdd',
-    version=versioneer.get_version(),
     license="MIT",
     author='Kohei Shinohara',
     author_email='kohei19950508@gmail.com',
     url='https://github.com/lan496/pyzdd',
-    description='python wrapper to TdZdd',
-    long_description='',
+    description='Python wrapper to TdZdd',
+    long_description=long_description,
+    long_description_content_type="text/markdown",
     packages=find_packages("pyzdd"),
     py_modules=[splitext(basename(path))[0] for path in glob("pyzdd/*.py")],
-    python_requires=">=3.7",
-    install_requires=["setuptools", "wheel"],
+    python_requires=">=3.8",
+    install_requires=[
+        "setuptools",
+        "setuptools_scm",
+        "wheel",
+        "networkx>=2.0",
+    ],
+    extras_require={
+        "dev": [
+            "pybind11==2.9.1",
+            "pre-commit",
+            "black",
+            "versioneer",
+            "pytest",
+            "pytest-cov",
+        ],
+    },
     test_requires=["pytest"],
     ext_modules=ext_modules,
-    setup_requires=['pybind11>=2.5.0'],
+    setup_requires=["setuptools_scm"],
+    use_scm_version=True,
     cmdclass={'build_ext': BuildExt},
     zip_safe=False,
+    classifiers=[
+        # Trove classifiers
+        # Full list: https://pypi.python.org/pypi?%3Aaction=list_classifiers
+        "Development Status :: 2 - Pre-Alpha",
+        "Intended Audience :: Science/Research",
+        "License :: OSI Approved :: MIT License",
+        "Operating System :: POSIX :: Linux",
+        "Programming Language :: Python",
+        "Programming Language :: Python :: 3.8",
+        "Programming Language :: Python :: 3.9",
+        "Programming Language :: Python :: 3.10",
+        "Topic :: Scientific/Engineering",
+    ],
 )

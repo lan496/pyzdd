@@ -180,3 +180,5 @@ Elimination.hpp
 *.pdf
 *.tex
 *.aux
+
+.vscode/
