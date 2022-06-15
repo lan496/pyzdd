@@ -4,7 +4,6 @@ project(pyzdd CXX)
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
-set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 
 # Fetch TdZdd and pybind11
 include(FetchContent)
@@ -22,7 +21,7 @@ FetchContent_Declare(
 FetchContent_MakeAvailable(tdzdd)
 FetchContent_MakeAvailable(pybind11)
 
-add_compile_options(-O3 -Wall -Winit-self -Wlogical-op)
+add_compile_options(-O3)
 include_directories(${tdzdd_SOURCE_DIR}/include)
 
 # Build `xtal_tdzdd` library
