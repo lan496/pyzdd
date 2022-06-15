@@ -90,7 +90,7 @@ setup(
             "pyupgrade",
         ],
     },
-    test_requires=["pytest"],
+    tests_require=["pytest"],
     ext_modules=[CMakeExtension("pyzdd_", sourcedir="./")],
     cmdclass={"build_ext": CMakeBuild},
     setup_requires=["setuptools_scm"],
