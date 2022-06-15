@@ -68,6 +68,7 @@ setup(
     description="Python wrapper to TdZdd",
     long_description=long_description,
     long_description_content_type="text/markdown",
+    package_dir={"": "pyzdd"},
     packages=find_packages("pyzdd"),
     py_modules=[splitext(basename(path))[0] for path in glob("pyzdd/*.py")],
     python_requires=">=3.8",
