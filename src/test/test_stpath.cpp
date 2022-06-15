@@ -1,7 +1,10 @@
 #include <iostream>
 #include <string>
+
+#include <gtest/gtest.h>
 #include <tdzdd/DdSpec.hpp>
 #include <tdzdd/DdStructure.hpp>
+
 #include "graph.hpp"
 #include "type.hpp"
 #include "spec/stpath.hpp"
@@ -26,7 +29,7 @@ Graph make_grid(int n) {
     return g;
 }
 
-int main() {
+TEST(StPathTest, GridGraphTest) {
     // https://oeis.org/A007764
     std::vector<std::string> ans = {
         "2",
@@ -72,6 +75,6 @@ int main() {
         std::ofstream output("debug.dot");
         dd.dumpDot(output);
         */
-        assert(actual == expect);
+        EXPECT_EQ(actual, expect);
     }
 }

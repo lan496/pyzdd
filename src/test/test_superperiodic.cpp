@@ -2,6 +2,7 @@
 #include <unordered_set>
 #include <cassert>
 
+#include <gtest/gtest.h>
 #include <tdzdd/DdSpec.hpp>
 #include <tdzdd/DdStructure.hpp>
 
@@ -121,9 +122,7 @@ void test_small(int n_max) {
     tdzdd::MessageHandler::showMessages(true);
 }
 
-int main() {
-    tdzdd::MessageHandler::showMessages(true);
+TEST(SuperperiodicTest, SmallTest) {
     test1();
     test_small(6);
-    return 0;
 }

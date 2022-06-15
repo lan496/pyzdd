@@ -2,6 +2,7 @@
 #include <unordered_set>
 #include <cassert>
 
+#include <gtest/gtest.h>
 #include <tdzdd/DdSpec.hpp>
 #include <tdzdd/DdStructure.hpp>
 
@@ -217,7 +218,7 @@ void test_developments(const Graph& g, const std::vector<Permutation>& vertex_au
     }
 }
 
-void test_tetrahedron() {
+TEST(PermutationTest, TetrahedronTest) {
     int V = 4;
     Graph g(V);
     add_undirected_edge(g, 0, 1, 1);
@@ -241,7 +242,7 @@ void test_tetrahedron() {
     test_developments(g, vertex_automorphism, count_labeled_expect, count_developments_expect);
 }
 
-void test_cube() {
+TEST(PermutationTest, CubeTest) {
     int V = 8;
     Graph g(V);
     add_undirected_edge(g, 0, 1, 1);
@@ -273,7 +274,7 @@ void test_cube() {
     test_developments(g, vertex_automorphism, count_labeled_expect, count_developments_expect);
 }
 
-void test_dodecahedron() {
+TEST(PermutationTest, dodecahedronTest){
     int V = 20;
     Graph g(V);
     add_undirected_edge(g, 0, 1, 1);
@@ -329,15 +330,10 @@ void test_dodecahedron() {
     test_developments(g, vertex_automorphism, count_labeled_expect, count_developments_expect);
 }
 
-int main() {
-    tdzdd::MessageHandler::showMessages(true);
+TEST(PermutationTest, SmallTest) {
     test1();
     test2();
     test3();
     test4();
     test_small(6);
-    test_tetrahedron();
-    test_cube();
-    test_dodecahedron();
-    return 0;
 }

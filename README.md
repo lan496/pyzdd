@@ -50,6 +50,15 @@ The citation for the isomorphism-elimination DD is as follows.
 pre-commit install
 ```
 
+### Testing
+
+```shell
+cd src
+cmake -S . -B build
+cmake --build build -j 32
+cd build && ctest -vv
+```
+
 ### Write Custom Specification
 1. Write a TdZdd-specification in `src/spec/*.hpp`
 2. Let the new specification class be `A`, wrap the following classes and methods in `src/wrapper.cpp`

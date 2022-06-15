@@ -1,6 +1,7 @@
 #include <iostream>
 #include <string>
 
+#include <gtest/gtest.h>
 #include <tdzdd/DdSpec.hpp>
 #include <tdzdd/DdStructure.hpp>
 
@@ -28,7 +29,7 @@ Graph make_grid(int n) {
     return g;
 }
 
-int main() {
+TEST(SpanningForestTest, GridGraphTest) {
     // Number of spanning trees in nxn grid graph
     // https://oeis.org/A007341
     std::vector<std::string> ans = {
@@ -72,6 +73,6 @@ int main() {
         dd.dumpDot(output);
 #endif
 
-        assert(actual == expect);
+        EXPECT_EQ(actual, expect);
     }
 }

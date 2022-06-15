@@ -4,6 +4,7 @@
 #include <unordered_set>
 #include <cassert>
 
+#include <gtest/gtest.h>
 #include <tdzdd/DdSpec.hpp>
 #include <tdzdd/DdStructure.hpp>
 
@@ -49,7 +50,7 @@ void check(
     assert(uset_actual == uset_expect);
 }
 
-void test_binary() {
+TEST(SroTest, BinaryTest) {
     int num_sites = 4;
     int num_types = 2;
     auto c4 = Permutation(std::vector<Element>{1, 2, 3, 0});
@@ -119,7 +120,7 @@ Permutation ravel_permutation(const Permutation& perm, int num_types) {
     return ret;
 }
 
-void test_multi() {
+TEST(SroTest, TernaryTest) {
     int num_sites = 8;
     int num_types = 3;
 
@@ -215,10 +216,4 @@ void test_multi() {
         std::vector<int> labeling = convert_to_binary_labeling_with_graph(itr, converter);
     }
     assert(std::stoi(dd.zddCardinality()) >= 1);
-}
-
-int main() {
-    test_binary();
-    test_multi();
-    return 0;
 }

@@ -2,6 +2,7 @@
 #include <unordered_set>
 #include <cassert>
 
+#include <gtest/gtest.h>
 #include <tdzdd/DdSpec.hpp>
 #include <tdzdd/DdStructure.hpp>
 
@@ -119,7 +120,9 @@ void test_small(int n_max) {
     }
 }
 
-void test_takeboth() {
+TEST(ChoiceTest, TakeBothTest) {
+    tdzdd::MessageHandler::showMessages(true);
+
     int n = 4;
 
     choice::TakeBoth spec(n);
@@ -128,16 +131,17 @@ void test_takeboth() {
 
     std::string expect = std::to_string((1 << n) - 2);
     std::string actual = dd.zddCardinality();
-    std::ofstream ofs("takeboth.dot");
-    dd.dumpDot(ofs);
-    assert(actual == expect);
+
+#ifdef _DEBUG
+    // std::ofstream ofs("takeboth.dot");
+    // dd.dumpDot(ofs);
+#endif
+    EXPECT_EQ(actual, expect);
+
+    tdzdd::MessageHandler::showMessages(false);
 }
 
-int main() {
-    tdzdd::MessageHandler::showMessages(true);
-    test_takeboth();
+TEST(ChoiceTest, SmallTest) {
     test1();
-    tdzdd::MessageHandler::showMessages(false);
     test_small(8);
-    return 0;
 }

@@ -2,8 +2,10 @@
 #include <string>
 #include <unordered_set>
 
+#include <gtest/gtest.h>
 #include <tdzdd/DdSpec.hpp>
 #include <tdzdd/DdStructure.hpp>
+
 #include "graph.hpp"
 #include "type.hpp"
 #include "utils.hpp"
@@ -112,9 +114,8 @@ void test3() {
     vgfm.dump(std::cerr);
 }
 
-int main() {
+TEST(InducedGraphTest, SmallTest) {
     test1();
     test2();
     // test3();
-    return 0;
 }

@@ -4,6 +4,7 @@
 #include <unordered_set>
 #include <cassert>
 
+#include <gtest/gtest.h>
 #include <tdzdd/DdSpec.hpp>
 // #include <tdzdd/DdStructure.hpp>
 
@@ -56,7 +57,7 @@ void check(
     assert(uset_actual == uset_expect);
 }
 
-void test_binary() {
+TEST(StructureEnumerationTest, BinaryTest) {
     // reproduce Fig.2
     int num_sites = 4;
     int num_types = 2;
@@ -272,7 +273,7 @@ void test_binary() {
     }
 }
 
-void test_multi() {
+TEST(StructureEnumerationTest, TernaryTest) {
     // reproduce Fig.5(b)
     int num_sites = 4;
     int num_types = 3;
@@ -547,11 +548,4 @@ void test_multi() {
         };
         check(num_sites, num_types, dd, cardinality_expect, enumerated_expect);
     }
-}
-
-int main() {
-    tdzdd::MessageHandler::showMessages(true);
-    test_binary();
-    test_multi();
-    return 0;
 }

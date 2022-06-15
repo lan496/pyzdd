@@ -183,3 +183,6 @@ Elimination.hpp
 
 .vscode/
 src/example/*
+
+# googletest
+**/Testing/*

@@ -2,6 +2,7 @@
 #include <unordered_set>
 #include <cassert>
 
+#include <gtest/gtest.h>
 #include <tdzdd/DdSpec.hpp>
 #include <tdzdd/DdStructure.hpp>
 
@@ -102,10 +103,9 @@ void test_small(int n_max) {
     }
 }
 
-int main() {
+TEST(CombinationTest, SmallTest) {
     tdzdd::MessageHandler::showMessages(true);
     test1();
     tdzdd::MessageHandler::showMessages(false);
     test_small(8);
-    return 0;
 }
