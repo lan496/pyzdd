@@ -26,10 +26,10 @@ add_compile_options(-O3 -Wall -Winit-self -Wlogical-op)
 include_directories(${tdzdd_SOURCE_DIR}/include)
 
 # Build `xtal_tdzdd` library
-add_subdirectory(./src)
+add_subdirectory(./xtal_tdzdd)
 
 message(STATUS ${pybind11_SOURCE_DIR})
 
 add_subdirectory(${pybind11_SOURCE_DIR})
-pybind11_add_module(pyzdd_ ./src/wrapper.cpp)
+pybind11_add_module(pyzdd_ ./xtal_tdzdd/wrapper.cpp)
 target_link_libraries(pyzdd_ PUBLIC xtal_tdzdd)

@@ -186,3 +186,8 @@ src/example/*
 
 # googletest
 **/Testing/*
+
+# CMake
+**/CMakeFiles/*
+**/Makefile
+**/cmake_install.cmake

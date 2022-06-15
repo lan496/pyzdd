@@ -1,11 +1,9 @@
 import os
-from os.path import splitext, basename
 from pathlib import Path
 import subprocess
-from setuptools import setup, Extension, find_packages
+from setuptools import setup, Extension
 from setuptools.command.build_ext import build_ext
 import sys
-from glob import glob
 
 
 with open(Path(__file__).resolve().parent / "README.md") as f:
@@ -37,9 +35,9 @@ class CMakeBuild(build_ext):
         # EXAMPLE_VERSION_INFO shows you how to pass a value into the C++ code
         # from Python.
         cmake_args = [
-            "-DCMAKE_LIBRARY_OUTPUT_DIRECTORY={}".format(extdir),
-            "-DPYTHON_EXECUTABLE={}".format(sys.executable),
-            "-DCMAKE_BUILD_TYPE={}".format(cfg),  # not used on MSVC, but no harm
+            f"-DCMAKE_LIBRARY_OUTPUT_DIRECTORY={extdir}",
+            f"-DPYTHON_EXECUTABLE={sys.executable}",
+            f"-DCMAKE_BUILD_TYPE={cfg}",  # not used on MSVC, but no harm
         ]
         build_args = []
 
@@ -68,9 +66,7 @@ setup(
     description="Python wrapper to TdZdd",
     long_description=long_description,
     long_description_content_type="text/markdown",
-    package_dir={"": "pyzdd"},
-    packages=find_packages("pyzdd"),
-    py_modules=[splitext(basename(path))[0] for path in glob("pyzdd/*.py")],
+    package_dir={"": "src"},
     python_requires=">=3.8",
     install_requires=[
         "setuptools",
