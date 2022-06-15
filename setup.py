@@ -1,7 +1,7 @@
 import os
 from pathlib import Path
 import subprocess
-from setuptools import setup, Extension
+from setuptools import setup, Extension, find_packages
 from setuptools.command.build_ext import build_ext
 import sys
 
@@ -60,14 +60,15 @@ class CMakeBuild(build_ext):
 setup(
     name="pyzdd",
     license="MIT",
-    author="Kohei Shinohara",
-    author_email="kohei19950508@gmail.com",
-    url="https://github.com/lan496/pyzdd",
     description="Python wrapper to TdZdd",
     long_description=long_description,
     long_description_content_type="text/markdown",
+    author="Kohei Shinohara",
+    author_email="kohei19950508@gmail.com",
     package_dir={"": "src"},
+    packages=find_packages("src"),
     python_requires=">=3.8",
+    setup_requires=["setuptools_scm"],
     install_requires=[
         "setuptools",
         "setuptools_scm",
@@ -91,9 +92,9 @@ setup(
     tests_require=["pytest"],
     ext_modules=[CMakeExtension("pyzdd_", sourcedir="./")],
     cmdclass={"build_ext": CMakeBuild},
-    setup_requires=["setuptools_scm"],
-    use_scm_version=True,
+    include_package_data=True,
     zip_safe=False,
+    use_scm_version=True,
     classifiers=[
         # Trove classifiers
         # Full list: https://pypi.python.org/pypi?%3Aaction=list_classifiers
@@ -107,4 +108,5 @@ setup(
         "Programming Language :: Python :: 3.10",
         "Topic :: Scientific/Engineering",
     ],
+    url="https://github.com/lan496/pyzdd",
 )
