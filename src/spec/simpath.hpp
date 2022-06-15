@@ -2,8 +2,8 @@
 #define PYZDD_GRAPHSPEC_H
 
 #include <algorithm>
-#include <memory>
 #include <climits>
+#include <memory>
 #include <tdzdd/DdSpec.hpp>
 #include "../graph.hpp"
 #include "../type.hpp"
@@ -23,7 +23,7 @@ enum MateConstant {
 /// if u belongs to a path, mate[u] = the other endpoint of the path,
 /// else if u does not belong to a path, mate[u] = u,
 /// else if u is in the midway of a path, mate[u] = MateConstant::MIDWAY
-class SimPath: public tdzdd::PodArrayDdSpec<SimPath, Mate, 2> {
+class SimPath : public tdzdd::PodArrayDdSpec<SimPath, Mate, 2> {
     const Vertex V_;
     const Vertex s_;
     const Vertex t_;
@@ -59,26 +59,25 @@ class SimPath: public tdzdd::PodArrayDdSpec<SimPath, Mate, 2> {
         }
     }
 
-    bool is_endpoint(Vertex u) const {
-        return ((u == s_) || (u == t_));
-    }
+    bool is_endpoint(Vertex u) const { return ((u == s_) || (u == t_)); }
 
-public:
-    SimPath(const GraphAuxiliary& graphaux, Vertex s, Vertex t) :
-        V_(graphaux.number_of_vertices()),
-        s_(s),
-        t_(t),
-        E_(graphaux.number_of_edges()),
-        max_frontier_size_(graphaux.get_max_frontier_size()),
-        graphaux(graphaux)
-    {
+   public:
+    SimPath(const GraphAuxiliary& graphaux, Vertex s, Vertex t)
+        : V_(graphaux.number_of_vertices()),
+          s_(s),
+          t_(t),
+          E_(graphaux.number_of_edges()),
+          max_frontier_size_(graphaux.get_max_frontier_size()),
+          graphaux(graphaux) {
         assert(std::is_pod<Mate>::value);
         if (graphaux.number_of_vertices() > INT_MAX) {
-            std::cerr << "The number of vertices should be smaller than " << INT_MAX << std::endl;
+            std::cerr << "The number of vertices should be smaller than "
+                      << INT_MAX << std::endl;
             exit(1);
         }
         if (s == t) {
-            std::cerr << "The endpoints s and t should be different." << std::endl;
+            std::cerr << "The endpoints s and t should be different."
+                      << std::endl;
             exit(1);
         }
 
@@ -98,7 +97,7 @@ public:
 
         // initialize Mate for introduced vertices
         const std::vector<Vertex>& introduced = graphaux.get_introduced(eid);
-        for (auto u: introduced) {
+        for (auto u : introduced) {
             set_mate(state, u, u);
         }
 
@@ -132,7 +131,8 @@ public:
             if ((mate_src == e.dst) && (mate_dst == e.src)) {
                 return Terminal::REJECT;
             }
-            if (((mate_src == s_) && (mate_dst == t_)) || ((mate_src == t_) && (mate_dst == s_))) {
+            if (((mate_src == s_) && (mate_dst == t_)) ||
+                ((mate_src == t_) && (mate_dst == s_))) {
                 // s ~~~ e.src -e- e.dst ~~~ t or t ~~~ e.src -e- e.dst ~~~ s
                 for (auto u : frontier) {
                     if (!is_endpoint(u) && (u != e.src) && (u != e.dst)) {
@@ -159,7 +159,7 @@ public:
                 set_mate(state, e.src, other_endpoint_dst);
             } else {
                 set_mate(state, e.src, MateConstant::MIDWAY);
-                for (auto u: frontier) {
+                for (auto u : frontier) {
                     if (u == other_endpoint_src) {
                         set_mate(state, u, other_endpoint_dst);
                     }
@@ -170,7 +170,7 @@ public:
                 set_mate(state, e.dst, other_endpoint_src);
             } else {
                 set_mate(state, e.dst, MateConstant::MIDWAY);
-                for (auto u: frontier) {
+                for (auto u : frontier) {
                     if (u == other_endpoint_dst) {
                         set_mate(state, u, other_endpoint_src);
                     }
@@ -210,21 +210,21 @@ public:
 
         std::cerr << "frontier" << std::endl;
         const auto& frontier = graphaux.get_frontier(eid);
-        for (auto u: frontier) {
+        for (auto u : frontier) {
             std::cerr << " " << u;
         }
         std::cerr << std::endl;
 
         std::cerr << "mate" << std::endl;
-        for (auto u: frontier) {
+        for (auto u : frontier) {
             std::cerr << " " << get_mate(state, u);
         }
         std::cerr << std::endl;
     }
 };
 
-} // namespace simpath
-} // namespace graph
-} // namespace pyzdd
+}  // namespace simpath
+}  // namespace graph
+}  // namespace pyzdd
 
 #endif  // PYZDD_GRAPHSPEC_H

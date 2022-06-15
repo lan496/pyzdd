@@ -6,11 +6,11 @@
 
 namespace pyzdd {
 namespace combination {
-class Combination: public tdzdd::DdSpec<Combination, int, 2> {
+class Combination : public tdzdd::DdSpec<Combination, int, 2> {
     const int n;
     const int k;
 
-public:
+   public:
     // choice k elements out of n.
     Combination(int n, int k) : n(n), k(k) {}
 
@@ -35,7 +35,8 @@ public:
 
 std::vector<std::vector<int>> brute_force_combination(int n, int k) {
     if (n > 64) {
-        std::cerr << "The current implementation does not support n > 64." << std::endl;
+        std::cerr << "The current implementation does not support n > 64."
+                  << std::endl;
     }
 
     std::vector<std::vector<int>> combs;
@@ -43,7 +44,8 @@ std::vector<std::vector<int>> brute_force_combination(int n, int k) {
         std::vector<int> comb;
         int count = 0;
         for (size_t i = 0; i < static_cast<size_t>(n); ++i) {
-            bool take = static_cast<bool>((bits >> i) & (static_cast<uint64_t>(1)));
+            bool take =
+                static_cast<bool>((bits >> i) & (static_cast<uint64_t>(1)));
             if (take) {
                 comb.emplace_back(i);
                 ++count;
@@ -57,6 +59,6 @@ std::vector<std::vector<int>> brute_force_combination(int n, int k) {
     return combs;
 }
 
-} // namespace combination
-} // namespace pyzdd
-#endif // PYZDD_COMBINATION_H
+}  // namespace combination
+}  // namespace pyzdd
+#endif  // PYZDD_COMBINATION_H

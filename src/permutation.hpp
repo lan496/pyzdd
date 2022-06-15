@@ -1,16 +1,16 @@
 #ifndef PYZDD_PERMUTATION_H
 #define PYZDD_PERMUTATION_H
 
-#include <iostream>
 #include <algorithm>
-#include <vector>
-#include <set>
-#include <queue>
-#include <numeric>
-#include <utility>
-#include <limits>
 #include <cassert>
+#include <iostream>
+#include <limits>
+#include <numeric>
+#include <queue>
+#include <set>
 #include <type_traits>
+#include <utility>
+#include <vector>
 #include "type.hpp"
 
 namespace pyzdd {
@@ -28,23 +28,25 @@ using FrontierPosition = Element;
 class Permutation {
     /// the number of elements
     Element n_;
-    /// represents a permutation in "one-line" notation. That is, `sigma` moves `i` to `sigma[i]`.
+    /// represents a permutation in "one-line" notation. That is, `sigma` moves
+    /// `i` to `sigma[i]`.
     std::vector<Element> sigma_;
-public:
-    Permutation(const std::vector<Element>& sigma) :
-        n_(static_cast<Element>(sigma.size())),
-        sigma_(sigma)
-    {
+
+   public:
+    Permutation(const std::vector<Element>& sigma)
+        : n_(static_cast<Element>(sigma.size())), sigma_(sigma) {
         // sanity check on Element class
         assert(std::is_unsigned<Element>::value);
         if (n_ > std::numeric_limits<Element>::max()) {
-            std::cerr << "The number of elements in a permutation should be less than "
-                        << std::numeric_limits<Element>::max() << "." << std::endl;
+            std::cerr << "The number of elements in a permutation should be "
+                         "less than "
+                      << std::numeric_limits<Element>::max() << "."
+                      << std::endl;
         }
 
         if (!is_permutation(sigma)) {
             std::cerr << "Given list is not a permutation:";
-            for (auto e: sigma) {
+            for (auto e : sigma) {
                 std::cerr << " " << static_cast<int>(e);
             }
             std::cerr << std::endl;
@@ -59,23 +61,17 @@ public:
     Permutation& operator=(Permutation&&) = default;
 
     /// @brief get the number of elements
-    size_t get_size() const {
-        return n_;
-    }
+    size_t get_size() const { return n_; }
 
-    const std::vector<Element>& get_sigma() const {
-        return sigma_;
-    }
+    const std::vector<Element>& get_sigma() const { return sigma_; }
 
     /// @brief permute i to sigma[i]
-    Element permute(const Element i) const {
-        return sigma_[i];
-    }
+    Element permute(const Element i) const { return sigma_[i]; }
 
     /// @brief act the permutation on a given sequence
     /// @tparam T is template param
     /// @param[in] colors colors[i] is permutated to colors[perm-1[i]]
-    template<typename T>
+    template <typename T>
     std::vector<T> act(const std::vector<T> colors) const {
         std::vector<T> permutated(colors.size());
         for (Element i = 0, n = get_size(); i < n; ++i) {
@@ -88,7 +84,8 @@ public:
     Permutation product(const Permutation& rhs) const {
         auto n = get_size();
         if (rhs.get_size() != n) {
-            std::cerr << "Cannot product permutations with the different bases." << std::endl;
+            std::cerr << "Cannot product permutations with the different bases."
+                      << std::endl;
             exit(1);
         }
         std::vector<Element> sigma(n);
@@ -116,7 +113,7 @@ public:
         os << " )" << std::endl;
     }
 
-private:
+   private:
     /// @brief check if `sigma` is a bijection.
     bool is_permutation(const std::vector<Element>& sigma) const {
         auto n = get_size();
@@ -157,13 +154,14 @@ Permutation get_identity(Element n) {
 }
 
 /// @brief generate a permutation group from given generators
-std::vector<Permutation> generate_group(const std::vector<Permutation>& generators) {
+std::vector<Permutation> generate_group(
+    const std::vector<Permutation>& generators) {
     if (generators.empty()) {
         return std::vector<Permutation>();
     }
 
     auto n = generators[0].get_size();
-    for (auto g: generators) {
+    for (auto g : generators) {
         assert(g.get_size() == n);
     }
 
@@ -173,8 +171,9 @@ std::vector<Permutation> generate_group(const std::vector<Permutation>& generato
     group.emplace_back(id);
     que.push(id);
     while (!que.empty()) {
-        auto q = que.front(); que.pop();
-        for (auto g: generators) {
+        auto q = que.front();
+        que.pop();
+        for (auto g : generators) {
             // from left
             auto gq = g.product(q);
             if (std::find(group.begin(), group.end(), gq) == group.end()) {
@@ -206,10 +205,12 @@ class PermutationFrontierManager {
     /// Just before coloring the i-th element, the states of elements in
     /// frontiers_[i] are required. Guaranteed to be sorted in ascending order.
     std::vector<std::vector<Element>> frontiers_;
-    /// Just after coloring the i-th element, original element compared_[i][].first
-    /// and permuted element compared_[i][].second can be compared.
-    std::vector<std::vector<std::pair<Element,Element>>> compared_;
-    /// After processing the i-th element, color of elements in forgotten_[i] are no more required.
+    /// Just after coloring the i-th element, original element
+    /// compared_[i][].first and permuted element compared_[i][].second can be
+    /// compared.
+    std::vector<std::vector<std::pair<Element, Element>>> compared_;
+    /// After processing the i-th element, color of elements in forgotten_[i]
+    /// are no more required.
     std::vector<std::vector<Element>> forgotten_;
     /// mapping_element_to_pos_[e] is a position of element e in frontiers.
     /// Be careful several elements may share the same position!
@@ -222,31 +223,26 @@ class PermutationFrontierManager {
     /// comp_finished_[i] is sorted in the ascending order.
     std::vector<std::vector<Element>> comp_finished_;
 
-public:
+   public:
     PermutationFrontierManager() = delete;
-    PermutationFrontierManager(const Permutation& perm) :
-        perm_(perm),
-        inv_perm_(perm.inverse())
-    {
+    PermutationFrontierManager(const Permutation& perm)
+        : perm_(perm), inv_perm_(perm.inverse()) {
         // construct frontiers, forgotten, and max_frontier_size
         construct_coloring_frontier();
         construct_comparison_frontier();
     }
 
     /// @brief get the number of elements of the permutation
-    Element get_size() const {
-        return perm_.get_size();
-    }
+    Element get_size() const { return perm_.get_size(); }
 
-    int get_max_frontier_size() const {
-        return max_frontier_size_;
-    }
+    int get_max_frontier_size() const { return max_frontier_size_; }
 
     const std::vector<Element>& get_frontier(Element e) const {
         return frontiers_[e];
     }
 
-    const std::vector<std::pair<Element, Element>>& get_compared(Element e) const {
+    const std::vector<std::pair<Element, Element>>& get_compared(
+        Element e) const {
         return compared_[e];
     }
 
@@ -274,7 +270,7 @@ public:
         os << "frontiers" << std::endl;
         for (Element e = 0; e < n; ++e) {
             os << "     " << e << ":";
-            for (auto ef: get_frontier(e)) {
+            for (auto ef : get_frontier(e)) {
                 os << " " << ef;
             }
             os << std::endl;
@@ -283,7 +279,7 @@ public:
         os << "compared" << std::endl;
         for (Element e = 0; e < n; ++e) {
             os << "     " << e << ":";
-            for (auto pair: get_compared(e)) {
+            for (auto pair : get_compared(e)) {
                 os << " (" << pair.first << ", " << pair.second << ")";
             }
             os << std::endl;
@@ -292,7 +288,7 @@ public:
         os << "forgotton" << std::endl;
         for (Element e = 0; e < n; ++e) {
             os << "     " << e << ":";
-            for (auto ef: get_forgotten(e)) {
+            for (auto ef : get_forgotten(e)) {
                 os << " " << ef;
             }
             os << std::endl;
@@ -307,7 +303,7 @@ public:
         os << "finished comparison" << std::endl;
         for (Element e = 0; e < n; ++e) {
             os << "     " << e << ":";
-            for (auto efc: get_comp_finished(e)) {
+            for (auto efc : get_comp_finished(e)) {
                 os << " " << efc;
             }
             os << std::endl;
@@ -315,7 +311,8 @@ public:
 
         os << std::endl;
     }
-private:
+
+   private:
     /// @brief construct frontiers and related
     void construct_coloring_frontier() {
         auto n = get_size();
@@ -325,7 +322,8 @@ private:
         // (sigma-1(e), e) are already compared.
         forgotten_.resize(n);
         for (Element e = 0; e < n; ++e) {
-            auto lifetime = std::max(e, std::max(perm_.permute(e), inv_perm_.permute(e)));
+            auto lifetime =
+                std::max(e, std::max(perm_.permute(e), inv_perm_.permute(e)));
             forgotten_[lifetime].emplace_back(e);
         }
 
@@ -337,18 +335,19 @@ private:
             bag.insert(e);
 
             // determine frontier
-            for (auto eb: bag) {
+            for (auto eb : bag) {
                 frontiers_[e].emplace_back(eb);
             }
             // forget elements
-            for (auto ef: forgotten_[e]) {
+            for (auto ef : forgotten_[e]) {
                 bag.erase(ef);
             }
         }
         assert(bag.empty());
 
         // prepare compared_
-        // In comparison phase, (e, sigma(e)) and (simga-1(e), e) could be compared.
+        // In comparison phase, (e, sigma(e)) and (simga-1(e), e) could be
+        // compared.
         compared_.resize(n);
         std::vector<bool> visit_compared(n, false);
         for (Element e = 0; e < n; ++e) {
@@ -370,7 +369,8 @@ private:
                 if (e_invperm < e) {
                     compared_[e].emplace_back(std::make_pair(e_invperm, e));
                     // e_invperm should be contained in the frontier
-                    assert(std::find(frontiers_[e].begin(), frontiers_[e].end(), e_invperm) != frontiers_[e].end());
+                    assert(std::find(frontiers_[e].begin(), frontiers_[e].end(),
+                                     e_invperm) != frontiers_[e].end());
                     assert(!visit_compared[e_invperm]);
                     visit_compared[e_invperm] = true;
                 }
@@ -382,8 +382,9 @@ private:
 
         // path with of the "propagation" graph
         max_frontier_size_ = 0;
-        for (const auto& f: frontiers_) {
-            max_frontier_size_ = std::max(static_cast<int>(f.size()), max_frontier_size_);
+        for (const auto& f : frontiers_) {
+            max_frontier_size_ =
+                std::max(static_cast<int>(f.size()), max_frontier_size_);
         }
 
         // map element to position
@@ -392,7 +393,8 @@ private:
         for (Element e = 0; e < n; ++e) {
             // introduce elements
             bool success = false;
-            for (FrontierPosition i = 0; i < static_cast<FrontierPosition>(max_frontier_size_); ++i) {
+            for (FrontierPosition i = 0;
+                 i < static_cast<FrontierPosition>(max_frontier_size_); ++i) {
                 if (!used[i]) {
                     mapping_element_to_pos_[e] = i;
                     used[i] = true;
@@ -403,12 +405,13 @@ private:
             assert(success);
 
             // forget elements
-            for (auto ef: forgotten_[e]) {
+            for (auto ef : forgotten_[e]) {
                 FrontierPosition released = mapping_element_to_pos_[ef];
                 used[released] = false;
             }
         }
-        for (FrontierPosition i = 0; i < static_cast<FrontierPosition>(max_frontier_size_); ++i) {
+        for (FrontierPosition i = 0;
+             i < static_cast<FrontierPosition>(max_frontier_size_); ++i) {
             assert(!used[i]);
         }
     }
@@ -420,21 +423,23 @@ private:
 
         for (Element e = 0; e < n; ++e) {
             const auto& compared = get_compared(e);
-            for (auto pair: compared) {
-                // comparison (ef, sigma(ef)) is executed after determining the value of element e
+            for (auto pair : compared) {
+                // comparison (ef, sigma(ef)) is executed after determining the
+                // value of element e
                 Element ef = pair.first;
                 finished.insert(ef);
             }
             comp_finished_[e].reserve(finished.size());
             // insert with sorting
-            for (auto itr = finished.begin(), end =finished.end(); itr != end; ++itr) {
+            for (auto itr = finished.begin(), end = finished.end(); itr != end;
+                 ++itr) {
                 comp_finished_[e].emplace_back(*itr);
             }
         }
     }
 };
 
-} // namespace permutation
-} // namespace pyzdd
+}  // namespace permutation
+}  // namespace pyzdd
 
-#endif // PYZDD_PERMUTATION_H
+#endif  // PYZDD_PERMUTATION_H

@@ -1,17 +1,17 @@
+#include <cassert>
 #include <iostream>
-#include <vector>
 #include <string>
 #include <unordered_set>
-#include <cassert>
+#include <vector>
 
 #include <gtest/gtest.h>
 #include <tdzdd/DdSpec.hpp>
 #include <tdzdd/DdStructure.hpp>
 
-#include "type.hpp"
-#include "permutation.hpp"
 #include "graph.hpp"
+#include "permutation.hpp"
 #include "short_range_order.hpp"
+#include "type.hpp"
 #include "utils.hpp"
 
 using namespace pyzdd;
@@ -19,25 +19,21 @@ using namespace pyzdd::permutation;
 using namespace pyzdd::graph;
 using namespace pyzdd::derivative_structure;
 
-void check(
-    int num_sites,
-    int num_types,
-    const tdzdd::DdStructure<2>& dd,
-    const std::vector<Vertex>& vertex_order,
-    const std::string cardinality_expect,
-    const std::vector<std::vector<int>>& enumerated_expect)
-{
+void check(int num_sites, int num_types, const tdzdd::DdStructure<2>& dd,
+           const std::vector<Vertex>& vertex_order,
+           const std::string cardinality_expect,
+           const std::vector<std::vector<int>>& enumerated_expect) {
     auto cardinality_actual = dd.zddCardinality();
     std::cerr << "# of structures: " << cardinality_actual << std::endl;
     if (cardinality_actual != cardinality_expect) {
         std::cerr << "The cardinality is wrong: (actual, expect) = ("
-                  << cardinality_actual << ", " << cardinality_expect
-                  << ")" << std::endl;
+                  << cardinality_actual << ", " << cardinality_expect << ")"
+                  << std::endl;
         exit(1);
     }
 
     std::unordered_set<std::vector<int>, VectorHash<int>> uset_expect;
-    for (auto labeling: enumerated_expect) {
+    for (auto labeling : enumerated_expect) {
         uset_expect.insert(labeling);
     }
 
@@ -66,9 +62,8 @@ TEST(SroTest, BinaryTest) {
     {
         tdzdd::DdStructure<2> dd;
 
-        std::vector<std::pair<std::vector<int>, int>> composition_constraints = {
-            std::make_pair(std::vector<int>{0, 1, 2, 3}, 2)
-        };
+        std::vector<std::pair<std::vector<int>, int>> composition_constraints =
+            {std::make_pair(std::vector<int>{0, 1, 2, 3}, 2)};
 
         Graph cluster_graph(num_variables);
         add_undirected_edge(cluster_graph, 0, 1, 2);
@@ -83,15 +78,8 @@ TEST(SroTest, BinaryTest) {
         std::vector<Weight> targets = {2};
 
         construct_derivative_structures_with_sro(
-            dd,
-            num_sites,
-            num_types,
-            vertex_order,
-            automorphism,
-            translations,
-            composition_constraints,
-            graphs,
-            targets,
+            dd, num_sites, num_types, vertex_order, automorphism, translations,
+            composition_constraints, graphs, targets,
             true,  // remove superperiodic
             false  // not useMP
         );
@@ -100,7 +88,8 @@ TEST(SroTest, BinaryTest) {
         std::vector<std::vector<int>> enumerated_expect = {
             {0, 0, 1, 1},
         };
-        check(num_sites, num_types, dd, vertex_order, cardinality_expect, enumerated_expect);
+        check(num_sites, num_types, dd, vertex_order, cardinality_expect,
+              enumerated_expect);
     }
 }
 
@@ -113,7 +102,8 @@ Permutation ravel_permutation(const Permutation& perm, int num_types) {
     std::vector<Element> sigma(num_sites * num_types);
     for (int specie = 0; specie < num_types; ++specie) {
         for (size_t site = 0; site < num_sites; ++site) {
-            sigma[ravel(site, specie, num_types)] = ravel(perm.permute(site), specie, num_types);
+            sigma[ravel(site, specie, num_types)] =
+                ravel(perm.permute(site), specie, num_types);
         }
     }
     auto ret = Permutation(sigma);
@@ -133,9 +123,11 @@ TEST(SroTest, TernaryTest) {
     auto t1_aug = ravel_permutation(t1, num_types);
     auto t2_aug = ravel_permutation(t2, num_types);
     auto m_aug = ravel_permutation(m, num_types);
-    auto automorphism = generate_group(std::vector<Permutation>{t1_aug, t2_aug, m_aug});
+    auto automorphism =
+        generate_group(std::vector<Permutation>{t1_aug, t2_aug, m_aug});
     assert(automorphism.size() == 16);
-    auto translations = generate_group(std::vector<Permutation>{t1_aug, t2_aug});
+    auto translations =
+        generate_group(std::vector<Permutation>{t1_aug, t2_aug});
     assert(translations.size() == 8);
 
     // composition constraints
@@ -146,7 +138,8 @@ TEST(SroTest, TernaryTest) {
         for (int site = 0; site < num_sites; ++site) {
             group.emplace_back(ravel(site, specie, num_types));
         }
-        composition_constraints.emplace_back(std::make_pair(group, composition[specie]));
+        composition_constraints.emplace_back(
+            std::make_pair(group, composition[specie]));
     }
 
     // SRO constraint
@@ -171,17 +164,13 @@ TEST(SroTest, TernaryTest) {
         for (int specie1 = specie0 + 1; specie1 < num_types; ++specie1) {
             Graph cg(num_variables);
             for (int u = 0; u < num_sites; ++u) {
-                for (Edge e: g[u]) {
-                    cg[ravel(u, specie0, num_types)].emplace_back(Edge(
-                        ravel(u, specie0, num_types),
-                        ravel(e.dst, specie1, num_types),
-                        e.weight
-                    ));
-                    cg[ravel(u, specie1, num_types)].emplace_back(Edge(
-                        ravel(u, specie1, num_types),
-                        ravel(e.dst, specie0, num_types),
-                        e.weight
-                    ));
+                for (Edge e : g[u]) {
+                    cg[ravel(u, specie0, num_types)].emplace_back(
+                        Edge(ravel(u, specie0, num_types),
+                             ravel(e.dst, specie1, num_types), e.weight));
+                    cg[ravel(u, specie1, num_types)].emplace_back(
+                        Edge(ravel(u, specie1, num_types),
+                             ravel(e.dst, specie0, num_types), e.weight));
                 }
             }
             cluster_graphs.emplace_back(cg);
@@ -193,18 +182,10 @@ TEST(SroTest, TernaryTest) {
     tdzdd::DdStructure<2> dd;
 
     construct_derivative_structures_with_sro(
-        dd,
-        num_sites,
-        num_types,
-        vertex_order,
-        automorphism,
-        translations,
-        composition_constraints,
-        cluster_graphs,
-        targets,
+        dd, num_sites, num_types, vertex_order, automorphism, translations,
+        composition_constraints, cluster_graphs, targets,
         true,  // remove superperiodic
-        false
-    );
+        false);
 
     // return labelings
     auto converter = VertexConverter(num_variables, vertex_order);
@@ -213,7 +194,8 @@ TEST(SroTest, TernaryTest) {
     // 0 0 1 0 0 1 0 1 0 0 1 0 1 0 0 1 0 0 1 0 0 1 0 0
     // 2     2     1     1     0     0     0     0
     for (auto itr = dd.begin(), end = dd.end(); itr != end; ++itr) {
-        std::vector<int> labeling = convert_to_binary_labeling_with_graph(itr, converter);
+        std::vector<int> labeling =
+            convert_to_binary_labeling_with_graph(itr, converter);
     }
     assert(std::stoi(dd.zddCardinality()) >= 1);
 }

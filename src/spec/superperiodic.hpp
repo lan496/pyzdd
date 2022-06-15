@@ -1,12 +1,12 @@
 #ifndef PYZDD_SUPERPERIODIC_H
 #define PYZDD_SUPERPERIODIC_H
 
-#include <climits>
 #include <cassert>
-#include <type_traits>
+#include <climits>
 #include <tdzdd/DdSpec.hpp>
-#include "../type.hpp"
+#include <type_traits>
 #include "../permutation.hpp"
+#include "../type.hpp"
 
 namespace pyzdd {
 namespace permutation {
@@ -19,14 +19,14 @@ namespace superperiodic {
 /// @brief manage the comparison of two colorings at a position.
 enum struct ElementComp : char {
     UNKNOWN = 0,
-    UNEQUAL = 1, // sigma(x[i]) != x[i]
+    UNEQUAL = 1,  // sigma(x[i]) != x[i]
     EQUAL = 2,    // sigma(x[i]) == x[i]
 };
 
 enum struct CompResult : char {
     UNKNOWN = 0,
-    UNEQUAL = 1, // sigma(x) != x
-    EQUAL = 2, // sigma(x) == x
+    UNEQUAL = 1,  // sigma(x) != x
+    EQUAL = 2,    // sigma(x) == x
 };
 
 // this class is POD type
@@ -58,14 +58,15 @@ std::ostream& operator<<(std::ostream& os, const CompResult result) {
         os << "UK";
     } else if (result == CompResult::UNEQUAL) {
         os << "!=";
-    } else if (result == CompResult::EQUAL){
+    } else if (result == CompResult::EQUAL) {
         os << "==";
     }
     return os;
 }
 
 std::ostream& operator<<(std::ostream& os, const CompPivot cp) {
-    os << "(result='" << cp.result << "', pivot=" << static_cast<int>(cp.pivot) << ", comp='" << cp.comp << "')";
+    os << "(result='" << cp.result << "', pivot=" << static_cast<int>(cp.pivot)
+       << ", comp='" << cp.comp << "')";
     return os;
 }
 
@@ -84,20 +85,22 @@ std::ostream& operator<<(std::ostream& os, const BinaryColor color) {
 
 /// @brief DD specification for representing colorings that do not coincide with
 ///        their permutated colorings
-/// @details see Sec. VI of K. Shinohara, et al., J. Chem. Phys. 153, 104109 (2020).
-class SuperperiodicElimination:
-    public tdzdd::HybridDdSpec<SuperperiodicElimination, CompPivot, BinaryColor, 2> {
+/// @details see Sec. VI of K. Shinohara, et al., J. Chem. Phys. 153, 104109
+/// (2020).
+class SuperperiodicElimination
+    : public tdzdd::HybridDdSpec<SuperperiodicElimination, CompPivot,
+                                 BinaryColor, 2> {
     const PermutationFrontierManager pfm_;
     const int max_frontier_size_;
     // the size of permutation
     const int n_;
-public:
+
+   public:
     SuperperiodicElimination() = delete;
-    SuperperiodicElimination(const PermutationFrontierManager& pfm) :
-        pfm_(pfm),
-        max_frontier_size_(pfm.get_max_frontier_size()),
-        n_(pfm.get_size())
-    {
+    SuperperiodicElimination(const PermutationFrontierManager& pfm)
+        : pfm_(pfm),
+          max_frontier_size_(pfm.get_max_frontier_size()),
+          n_(pfm.get_size()) {
         // sanity check on types
         assert(std::is_pod<CompPivot>::value);
         assert(std::is_pod<BinaryColor>::value);
@@ -111,7 +114,8 @@ public:
         return n_;
     }
 
-    int getChild(CompPivot& cp, BinaryColor* state, int level, int value) const {
+    int getChild(CompPivot& cp, BinaryColor* state, int level,
+                 int value) const {
         const Element e = n_ - level;
 
         // if the whole comparison is already determined, do not care value
@@ -142,7 +146,7 @@ public:
         const auto& compared = pfm_.get_compared(e);
         std::vector<std::pair<Element, ElementComp>> new_comps;
         new_comps.reserve(compared.size());
-        for (auto i_and_si: compared) {
+        for (auto i_and_si : compared) {
             BinaryColor color_i = get_color(state, i_and_si.first);
             BinaryColor color_si = get_color(state, i_and_si.second);
             assert(color_i != UNUSED_COLOR);
@@ -174,7 +178,7 @@ public:
 
         // forget
         const std::vector<Element>& forgotten = pfm_.get_forgotten(e);
-        for (auto ef: forgotten) {
+        for (auto ef : forgotten) {
             // color of ef is no more needed.
             reset_color(state, ef);
         }
@@ -187,19 +191,21 @@ public:
         if (level == 1) {
             if (cp.result == CompResult::UNEQUAL) {
                 return Terminal::ACCEPT;
-            } else if (cp.result == CompResult::EQUAL){
+            } else if (cp.result == CompResult::EQUAL) {
                 return Terminal::REJECT;
             } else {
-                assert(false); // unreachable
+                assert(false);  // unreachable
             }
         }
         return level - 1;
     }
-private:
+
+   private:
     void reset_comppivot(CompPivot& cp) const {
         cp.result = CompResult::UNKNOWN;
         cp.pivot = n_;
-        cp.comp = ElementComp::EQUAL;  // set EQUAL to simplify implementation of compress_state
+        cp.comp = ElementComp::EQUAL;  // set EQUAL to simplify implementation
+                                       // of compress_state
     }
 
     void init_state(BinaryColor* state) const {
@@ -220,10 +226,11 @@ private:
         state[pfm_.map_element_to_position(e)] = UNUSED_COLOR;
     }
 
-    void compress_state(CompPivot& cp, BinaryColor* state, Element e,
-                              const std::vector<std::pair<Element, ElementComp>>& new_comps) const {
+    void compress_state(
+        CompPivot& cp, BinaryColor* state, Element e,
+        const std::vector<std::pair<Element, ElementComp>>& new_comps) const {
         // update pivot and comp
-        for (auto i_and_comp: new_comps) {
+        for (auto i_and_comp : new_comps) {
             Element ec = i_and_comp.first;
             ElementComp new_comp = i_and_comp.second;
             assert(ec != cp.pivot);
@@ -235,7 +242,8 @@ private:
                     cp.comp = new_comp;
                 }
             } else {
-                if ((cp.comp == ElementComp::EQUAL) && (new_comp == ElementComp::UNEQUAL)) {
+                if ((cp.comp == ElementComp::EQUAL) &&
+                    (new_comp == ElementComp::UNEQUAL)) {
                     // here old cp.pivot is useless
                     cp.pivot = ec;
                     cp.comp = new_comp;
@@ -256,7 +264,7 @@ private:
                 } else if (cp.comp == ElementComp::EQUAL) {
                     cp.result = CompResult::EQUAL;
                 } else {
-                    assert(false); // unreachable
+                    assert(false);  // unreachable
                 }
             } else {
                 if (cp.comp == ElementComp::UNEQUAL) {
@@ -270,26 +278,28 @@ private:
         }
     }
 
-    void dump_comppivot_and_state(std::ostream& os, CompPivot& cp, BinaryColor* state, int level) const {
+    void dump_comppivot_and_state(std::ostream& os, CompPivot& cp,
+                                  BinaryColor* state, int level) const {
         Element e = n_ - level;
         os << "     CompPivot : " << cp << std::endl;
 
         os << "     frontier  :";
         const auto& frontier = pfm_.get_frontier(e);
-        for (auto efr: frontier) {
+        for (auto efr : frontier) {
             os << " " << static_cast<int>(efr);
         }
         os << std::endl;
 
         os << "     color     :";
-        for (auto efr: frontier) {
+        for (auto efr : frontier) {
             os << " " << get_color(state, efr);
         }
         os << std::endl;
     }
 };
 
-bool is_equal_coloring(const std::vector<BinaryColor>& lhs, const std::vector<BinaryColor>& rhs) {
+bool is_equal_coloring(const std::vector<BinaryColor>& lhs,
+                       const std::vector<BinaryColor>& rhs) {
     size_t n = lhs.size();
     assert(rhs.size() == n);
     for (size_t i = 0; i < n; ++i) {
@@ -302,16 +312,19 @@ bool is_equal_coloring(const std::vector<BinaryColor>& lhs, const std::vector<Bi
 }
 
 /// @brief let n = perm.get_size(), this function takes O(2^n).
-std::vector<std::vector<BinaryColor>> brute_force_superperiodic_elimination(const Permutation& perm) {
+std::vector<std::vector<BinaryColor>> brute_force_superperiodic_elimination(
+    const Permutation& perm) {
     size_t n = perm.get_size();
     if (n > 64) {
-        std::cerr << "The current implementation does not support n > 64." << std::endl;
+        std::cerr << "The current implementation does not support n > 64."
+                  << std::endl;
     }
     std::vector<std::vector<BinaryColor>> remains;
     for (uint64_t bits = 0; bits < (static_cast<uint64_t>(1) << n); ++bits) {
         std::vector<BinaryColor> colors(n);
         for (size_t i = 0; i < n; ++i) {
-            colors[i] = static_cast<BinaryColor>((bits >> i) & (static_cast<uint64_t>(1)));
+            colors[i] = static_cast<BinaryColor>((bits >> i) &
+                                                 (static_cast<uint64_t>(1)));
         }
         if (!is_equal_coloring(colors, perm.act(colors))) {
             remains.emplace_back(colors);
@@ -320,8 +333,8 @@ std::vector<std::vector<BinaryColor>> brute_force_superperiodic_elimination(cons
     return remains;
 }
 
-} // namespace superperiodic
-} // namespace permutation
-} // namespace pyzdd
+}  // namespace superperiodic
+}  // namespace permutation
+}  // namespace pyzdd
 
-#endif // PYZDD_SUPERPERIODIC_H
+#endif  // PYZDD_SUPERPERIODIC_H

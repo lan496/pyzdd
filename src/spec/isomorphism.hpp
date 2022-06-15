@@ -1,12 +1,12 @@
 #ifndef PYZDD_ISOMORPHISM_H
 #define PYZDD_ISOMORPHISM_H
 
-#include <climits>
 #include <cassert>
-#include <type_traits>
+#include <climits>
 #include <tdzdd/DdSpec.hpp>
-#include "../type.hpp"
+#include <type_traits>
 #include "../permutation.hpp"
+#include "../type.hpp"
 
 namespace pyzdd {
 namespace permutation {
@@ -26,8 +26,8 @@ enum struct ElementComp : char {
 
 enum struct CompResult : char {
     UNKNOWN = 0,
-    GREATER = 1, // sigma(x) > x
-    SMALLER_OR_EQUAL = 2, // sigma(x) <= x
+    GREATER = 1,           // sigma(x) > x
+    SMALLER_OR_EQUAL = 2,  // sigma(x) <= x
 };
 
 // this class is POD type
@@ -61,14 +61,15 @@ std::ostream& operator<<(std::ostream& os, const CompResult result) {
         os << " U";
     } else if (result == CompResult::GREATER) {
         os << " >";
-    } else if (result == CompResult::SMALLER_OR_EQUAL){
+    } else if (result == CompResult::SMALLER_OR_EQUAL) {
         os << "<=";
     }
     return os;
 }
 
 std::ostream& operator<<(std::ostream& os, const CompPivot cp) {
-    os << "(result='" << cp.result << "', pivot=" << static_cast<int>(cp.pivot) << ", comp='" << cp.comp << "')";
+    os << "(result='" << cp.result << "', pivot=" << static_cast<int>(cp.pivot)
+       << ", comp='" << cp.comp << "')";
     return os;
 }
 
@@ -88,20 +89,22 @@ std::ostream& operator<<(std::ostream& os, const BinaryColor color) {
 /// @brief DD specification for representing coloring that is lexicographically
 ///        smaller than or equal to a permutated coloring. Note that the
 ///        reference enumerate lexicographically greater than or equal.
-/// @details see T. Horiyama, M. Miyasaka, and R. Sasaki, in the Canadian Conference on Computational Geometry (2018).
-class IsomorphismElimination:
-    public tdzdd::HybridDdSpec<IsomorphismElimination, CompPivot, BinaryColor, 2> {
+/// @details see T. Horiyama, M. Miyasaka, and R. Sasaki, in the Canadian
+/// Conference on Computational Geometry (2018).
+class IsomorphismElimination
+    : public tdzdd::HybridDdSpec<IsomorphismElimination, CompPivot, BinaryColor,
+                                 2> {
     const PermutationFrontierManager pfm_;
     const int max_frontier_size_;
     // the size of permutation
     const int n_;
-public:
+
+   public:
     IsomorphismElimination() = delete;
-    IsomorphismElimination(const PermutationFrontierManager& pfm) :
-        pfm_(pfm),
-        max_frontier_size_(pfm.get_max_frontier_size()),
-        n_(pfm.get_size())
-    {
+    IsomorphismElimination(const PermutationFrontierManager& pfm)
+        : pfm_(pfm),
+          max_frontier_size_(pfm.get_max_frontier_size()),
+          n_(pfm.get_size()) {
         // sanity check on types
         assert(std::is_pod<CompPivot>::value);
         assert(std::is_pod<BinaryColor>::value);
@@ -115,7 +118,8 @@ public:
         return n_;
     }
 
-    int getChild(CompPivot& cp, BinaryColor* state, int level, int value) const {
+    int getChild(CompPivot& cp, BinaryColor* state, int level,
+                 int value) const {
         const Element e = n_ - level;
 
         // if the whole comparison is already determined, do not care value
@@ -146,7 +150,7 @@ public:
         const auto& compared = pfm_.get_compared(e);
         std::vector<std::pair<Element, ElementComp>> new_comps;
         new_comps.reserve(compared.size());
-        for (auto i_and_si: compared) {
+        for (auto i_and_si : compared) {
             BinaryColor color_i = get_color(state, i_and_si.first);
             BinaryColor color_si = get_color(state, i_and_si.second);
             assert(color_i != UNUSED_COLOR);
@@ -179,7 +183,7 @@ public:
 
         // forget
         const std::vector<Element>& forgotten = pfm_.get_forgotten(e);
-        for (auto ef: forgotten) {
+        for (auto ef : forgotten) {
             // color of ef is no more needed.
             reset_color(state, ef);
         }
@@ -198,11 +202,13 @@ public:
         }
         return level - 1;
     }
-private:
+
+   private:
     void reset_comppivot(CompPivot& cp) const {
         cp.result = CompResult::UNKNOWN;
         cp.pivot = n_;
-        cp.comp = ElementComp::EQUAL;  // set EQUAL to simplify implementation of compress_state
+        cp.comp = ElementComp::EQUAL;  // set EQUAL to simplify implementation
+                                       // of compress_state
     }
 
     void init_state(BinaryColor* state) const {
@@ -224,10 +230,11 @@ private:
     }
 
     /// @brief Algorithm 3 in the reference
-    void compress_state(CompPivot& cp, BinaryColor* state, Element e,
-                              const std::vector<std::pair<Element, ElementComp>>& new_comps) const {
+    void compress_state(
+        CompPivot& cp, BinaryColor* state, Element e,
+        const std::vector<std::pair<Element, ElementComp>>& new_comps) const {
         // update pivot and comp
-        for (auto i_and_comp: new_comps) {
+        for (auto i_and_comp : new_comps) {
             Element ec = i_and_comp.first;
             ElementComp new_comp = i_and_comp.second;
             assert(ec != cp.pivot);
@@ -239,7 +246,8 @@ private:
                     cp.comp = new_comp;
                 }
             } else {
-                if ((cp.comp == ElementComp::EQUAL) && (new_comp != ElementComp::EQUAL)) {
+                if ((cp.comp == ElementComp::EQUAL) &&
+                    (new_comp != ElementComp::EQUAL)) {
                     // here old cp.pivot is useless
                     cp.pivot = ec;
                     cp.comp = new_comp;
@@ -255,16 +263,18 @@ private:
         if ((comp_finished.size() > e) && (comp_finished[e] == e)) {
             if (comp_finished.size() == static_cast<size_t>(n_)) {
                 // Here, all comparisons are finished.
-                if ((cp.comp == ElementComp::SMALLER) || (cp.comp == ElementComp::EQUAL)) {
+                if ((cp.comp == ElementComp::SMALLER) ||
+                    (cp.comp == ElementComp::EQUAL)) {
                     cp.result = CompResult::SMALLER_OR_EQUAL;
                 } else if (cp.comp == ElementComp::GREATER) {
                     cp.result = CompResult::GREATER;
                 } else {
-                    assert(false); // unreachable
+                    assert(false);  // unreachable
                 }
             } else {
                 if (cp.comp == ElementComp::SMALLER) {
-                    // determined to be lexicographically smaller than the permutated.
+                    // determined to be lexicographically smaller than the
+                    // permutated.
                     reset_comppivot(cp);
                     cp.result = CompResult::SMALLER_OR_EQUAL;
                     // forget state for compression
@@ -276,26 +286,28 @@ private:
         }
     }
 
-    void dump_comppivot_and_state(std::ostream& os, CompPivot& cp, BinaryColor* state, int level) const {
+    void dump_comppivot_and_state(std::ostream& os, CompPivot& cp,
+                                  BinaryColor* state, int level) const {
         Element e = n_ - level;
         os << "     CompPivot : " << cp << std::endl;
 
         os << "     frontier  :";
         const auto& frontier = pfm_.get_frontier(e);
-        for (auto efr: frontier) {
+        for (auto efr : frontier) {
             os << " " << static_cast<int>(efr);
         }
         os << std::endl;
 
         os << "     color     :";
-        for (auto efr: frontier) {
+        for (auto efr : frontier) {
             os << " " << get_color(state, efr);
         }
         os << std::endl;
     }
 };
 
-bool is_lexicographically_smaller_or_equal(const std::vector<BinaryColor>& lhs, const std::vector<BinaryColor>& rhs) {
+bool is_lexicographically_smaller_or_equal(
+    const std::vector<BinaryColor>& lhs, const std::vector<BinaryColor>& rhs) {
     size_t n = lhs.size();
     assert(rhs.size() == n);
     for (size_t i = 0; i < n; ++i) {
@@ -310,16 +322,19 @@ bool is_lexicographically_smaller_or_equal(const std::vector<BinaryColor>& lhs, 
 }
 
 /// @brief let n = perm.get_size(), this function takes O(2^n).
-std::vector<std::vector<BinaryColor>> brute_force_isomophism_elimination(const Permutation& perm) {
+std::vector<std::vector<BinaryColor>> brute_force_isomophism_elimination(
+    const Permutation& perm) {
     size_t n = perm.get_size();
     if (n > 64) {
-        std::cerr << "The current implementation does not support n > 64." << std::endl;
+        std::cerr << "The current implementation does not support n > 64."
+                  << std::endl;
     }
     std::vector<std::vector<BinaryColor>> winners;
     for (uint64_t bits = 0; bits < (static_cast<uint64_t>(1) << n); ++bits) {
         std::vector<BinaryColor> colors(n);
         for (size_t i = 0; i < n; ++i) {
-            colors[i] = static_cast<BinaryColor>((bits >> i) & (static_cast<uint64_t>(1)));
+            colors[i] = static_cast<BinaryColor>((bits >> i) &
+                                                 (static_cast<uint64_t>(1)));
         }
         if (is_lexicographically_smaller_or_equal(colors, perm.act(colors))) {
             winners.emplace_back(colors);
@@ -328,8 +343,8 @@ std::vector<std::vector<BinaryColor>> brute_force_isomophism_elimination(const P
     return winners;
 }
 
-} // namespace isomorphism
-} // namespace permutation
-} // namespace pyzdd
+}  // namespace isomorphism
+}  // namespace permutation
+}  // namespace pyzdd
 
-#endif // PYZDD_ISOMORPHISM_H
+#endif  // PYZDD_ISOMORPHISM_H

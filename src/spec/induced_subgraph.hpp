@@ -14,26 +14,30 @@ namespace induced_subgraph {
 /// @brief ZDD to represent vertex-induced subgraphs with the fixed weight.
 ///        here a weight of a subgraph is defined as the sum of weight of
 ///        edges which the subgraph possesses.
-class VertexInducedSubgraphSpec :
-    public tdzdd::HybridDdSpec<VertexInducedSubgraphSpec, Weight, bool, 2> {
+class VertexInducedSubgraphSpec
+    : public tdzdd::HybridDdSpec<VertexInducedSubgraphSpec, Weight, bool, 2> {
     VertexGraphFrontierManager vgfm_;
     Weight target_;
     int max_frontier_size_;
     // the number of vertices
     int V_;
-    // weight_sum_lower_bound[vid] is minimum weight sum by taking vid and afterwards
+    // weight_sum_lower_bound[vid] is minimum weight sum by taking vid and
+    // afterwards
     std::vector<Weight> weight_sum_lower_bound_;
-    // weight_sum_upper_bound[vid] is maximum weight sum by taking vid and afterwards
+    // weight_sum_upper_bound[vid] is maximum weight sum by taking vid and
+    // afterwards
     std::vector<Weight> weight_sum_upper_bound_;
-public:
+
+   public:
     VertexInducedSubgraphSpec() = delete;
     VertexInducedSubgraphSpec(const VertexInducedSubgraphSpec&) = default;
 
-    VertexInducedSubgraphSpec(const VertexGraphFrontierManager& vgfm, Weight target) :
-        vgfm_(vgfm),
-        target_(target),
-        max_frontier_size_(vgfm.get_max_frontier_size()),
-        V_(vgfm.number_of_vertices()) {
+    VertexInducedSubgraphSpec(const VertexGraphFrontierManager& vgfm,
+                              Weight target)
+        : vgfm_(vgfm),
+          target_(target),
+          max_frontier_size_(vgfm.get_max_frontier_size()),
+          V_(vgfm.number_of_vertices()) {
         // sanity check on types
         assert(std::is_pod<Weight>::value);
         assert(std::is_pod<bool>::value);
@@ -45,8 +49,9 @@ public:
         weight_sum_lower_bound_[V_] = 0;
         for (int vid = V_ - 1; vid >= 0; --vid) {
             weight_sum_lower_bound_[vid] = weight_sum_lower_bound_[vid + 1];
-            const std::vector<Edge>& processed_edges = vgfm_.get_processed_edges(vid);
-            for (auto e: processed_edges) {
+            const std::vector<Edge>& processed_edges =
+                vgfm_.get_processed_edges(vid);
+            for (auto e : processed_edges) {
                 weight_sum_lower_bound_[vid] += std::min(0, e.weight);
             }
         }
@@ -55,8 +60,9 @@ public:
         weight_sum_upper_bound_[V_] = 0;
         for (int vid = V_ - 1; vid >= 0; --vid) {
             weight_sum_upper_bound_[vid] = weight_sum_upper_bound_[vid + 1];
-            const std::vector<Edge>& processed_edges = vgfm_.get_processed_edges(vid);
-            for (auto e: processed_edges) {
+            const std::vector<Edge>& processed_edges =
+                vgfm_.get_processed_edges(vid);
+            for (auto e : processed_edges) {
                 weight_sum_upper_bound_[vid] += std::max(0, e.weight);
             }
         }
@@ -100,7 +106,8 @@ public:
 
 #ifdef _DEBUG
         std::cerr << std::endl;
-        std::cerr << "# vid=" << vid << ", vertex=" << v << ", value=" << value << std::endl;
+        std::cerr << "# vid=" << vid << ", vertex=" << v << ", value=" << value
+                  << std::endl;
         std::cerr << "Before processing vertex" << std::endl;
         dump(std::cerr, current_sum, state, level);
 #endif
@@ -108,8 +115,9 @@ public:
         // iff value == true, choose v in subgraph
         set_state(state, v, value);
         if (value == 1) {
-            const std::vector<Edge>& proccessed_edges = vgfm_.get_processed_edges(vid);
-            for (Edge e: proccessed_edges) {
+            const std::vector<Edge>& proccessed_edges =
+                vgfm_.get_processed_edges(vid);
+            for (Edge e : proccessed_edges) {
                 assert(get_state(state, e.src));
                 if (get_state(state, e.dst)) {
                     current_sum += e.weight;
@@ -124,7 +132,7 @@ public:
 
         // forget
         const std::vector<Vertex>& forgotten = vgfm_.get_forgotten(vid);
-        for (auto uu: forgotten) {
+        for (auto uu : forgotten) {
             // vertex uu is no more needed
             reset_state(state, uu);
         }
@@ -145,10 +153,8 @@ public:
         }
     }
 
-private:
-    void init_weight_sum(Weight& current_sum) const {
-        current_sum = 0;
-    }
+   private:
+    void init_weight_sum(Weight& current_sum) const { current_sum = 0; }
 
     void init_state(bool* state) const {
         for (int i = 0; i < max_frontier_size_; ++i) {
@@ -178,28 +184,28 @@ private:
         return weight_sum_upper_bound_[vid];
     }
 
-    void dump(std::ostream& os, Weight& current_sum, bool* state, int level) const {
+    void dump(std::ostream& os, Weight& current_sum, bool* state,
+              int level) const {
         InternalVertexId vid = V_ - level;
         os << "     weight sum:" << current_sum << std::endl;
 
         os << "     frontier:";
         const std::vector<Vertex>& frontier = vgfm_.get_frontier(vid);
-        for (Vertex uu: frontier) {
+        for (Vertex uu : frontier) {
             os << " " << uu;
         }
         os << std::endl;
 
         os << "     state:";
-        for (Vertex uu: frontier) {
+        for (Vertex uu : frontier) {
             os << " " << get_state(state, uu);
         }
         os << std::endl;
     }
-
 };
 
-} // namespace induced_subgraph
-} // namespace graph
-} // namespace pyzdd
+}  // namespace induced_subgraph
+}  // namespace graph
+}  // namespace pyzdd
 
-#endif // PYZDD_INDUCED_SUBGRAPH_H
+#endif  // PYZDD_INDUCED_SUBGRAPH_H

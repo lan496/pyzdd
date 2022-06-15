@@ -6,8 +6,8 @@
 #include <tdzdd/DdStructure.hpp>
 
 #include "graph.hpp"
-#include "type.hpp"
 #include "spec/spanning_forest.hpp"
+#include "type.hpp"
 
 using namespace pyzdd;
 using namespace pyzdd::graph;
@@ -32,6 +32,7 @@ Graph make_grid(int n) {
 TEST(SpanningForestTest, GridGraphTest) {
     // Number of spanning trees in nxn grid graph
     // https://oeis.org/A007341
+    // clang-format off
     std::vector<std::string> ans = {
         "4",
         "192",
@@ -45,13 +46,15 @@ TEST(SpanningForestTest, GridGraphTest) {
         "40325021721404118513276859513497679249183623593590784",
         "2954540993952788006228764987084443226815814190099484786032640000"  // n=12
     };
+    // clang-format on
 
     tdzdd::MessageHandler::showMessages(true);
     for (int n = 2; n <= 6; ++n) {
         Graph g = make_grid(n);
         auto gaux = GraphAuxiliary(g);
         // gaux.dump(std::cerr);
-        std::cerr << "Frontier size: " << gaux.get_max_frontier_size() << std::endl;
+        std::cerr << "Frontier size: " << gaux.get_max_frontier_size()
+                  << std::endl;
 
         auto spec = spanning_forest::SpanningForestSpec(gaux);
 
@@ -66,7 +69,8 @@ TEST(SpanningForestTest, GridGraphTest) {
 
         auto actual = dd.zddCardinality();
         auto expect = ans[n - 2];
-        std::cerr << "n = " << n << ", # of solutions = " << dd.zddCardinality() << std::endl;
+        std::cerr << "n = " << n << ", # of solutions = " << dd.zddCardinality()
+                  << std::endl;
 
 #ifdef _DEBUG
         std::ofstream output("debug.dot");

@@ -1,16 +1,16 @@
+#include <cassert>
 #include <iostream>
 #include <unordered_set>
-#include <cassert>
 
 #include <gtest/gtest.h>
 #include <tdzdd/DdSpec.hpp>
 #include <tdzdd/DdStructure.hpp>
 
-#include <permutation.hpp>
-#include <type.hpp>
 #include <graph.hpp>
+#include <permutation.hpp>
 #include <spec/isomorphism.hpp>
 #include <spec/spanning_forest.hpp>
+#include <type.hpp>
 
 using namespace pyzdd;
 using namespace pyzdd::graph;
@@ -22,7 +22,7 @@ struct VectorHash {
         std::hash<isomorphism::BinaryColor> hasher;
         size_t seed = 0;
         for (auto i : v) {
-            seed ^= hasher(i) + 0x9e3779b9 + (seed<<6) + (seed>>2);
+            seed ^= hasher(i) + 0x9e3779b9 + (seed << 6) + (seed >> 2);
         }
         return seed;
     }
@@ -54,19 +54,19 @@ std::string check_enumerated(const Permutation& perm) {
 
     auto expect = isomorphism::brute_force_isomophism_elimination(perm);
     if (actual != std::to_string(expect.size())) {
-        std::cerr << "The cardinality is wrong: (actual, expect) = ("
-                  << actual << ", " << expect.size() << ")" << std::endl;
+        std::cerr << "The cardinality is wrong: (actual, expect) = (" << actual
+                  << ", " << expect.size() << ")" << std::endl;
         exit(1);
     }
     std::unordered_set<Coloring, VectorHash> uset_expect;
-    for (auto coloring: expect) {
+    for (auto coloring : expect) {
         uset_expect.insert(coloring);
     }
 
     std::unordered_set<Coloring, VectorHash> uset_actual;
     for (auto itr = dd.begin(), end = dd.end(); itr != end; ++itr) {
         Coloring choice(n, 0);
-        for (auto level: *itr) {
+        for (auto level : *itr) {
             choice[n - level] = 1;
         }
         uset_actual.insert(choice);
@@ -74,18 +74,18 @@ std::string check_enumerated(const Permutation& perm) {
 
     if (uset_actual != uset_expect) {
         std::cerr << "DD" << std::endl;
-        for (auto choice: uset_actual) {
+        for (auto choice : uset_actual) {
             std::cerr << "  ";
-            for (auto c: choice) {
+            for (auto c : choice) {
                 std::cerr << static_cast<int>(c);
             }
             std::cerr << std::endl;
         }
 
         std::cerr << "brute force" << std::endl;
-        for (auto choice: uset_expect) {
+        for (auto choice : uset_expect) {
             std::cerr << "  ";
-            for (auto c: choice) {
+            for (auto c : choice) {
                 std::cerr << static_cast<int>(c);
             }
             std::cerr << std::endl;
@@ -142,18 +142,22 @@ void test_small(int n_max) {
     tdzdd::MessageHandler::showMessages(true);
 }
 
-std::vector<Permutation> generate_edge_automorphism(const std::vector<Permutation>& vertex_automorphism, const std::vector<Edge>& edge_order) {
+std::vector<Permutation> generate_edge_automorphism(
+    const std::vector<Permutation>& vertex_automorphism,
+    const std::vector<Edge>& edge_order) {
     int E = edge_order.size();
     std::vector<Permutation> edge_automorphism;
-    for (auto perm: vertex_automorphism) {
+    for (auto perm : vertex_automorphism) {
         std::vector<Element> sigma(E);
         for (int i = 0; i < E; ++i) {
             Edge e = edge_order[i];
-            Edge permuted = Edge(perm.permute(e.src), perm.permute(e.dst), e.weight);
+            Edge permuted =
+                Edge(perm.permute(e.src), perm.permute(e.dst), e.weight);
             bool success = false;
             for (int j = 0; j < E; ++j) {
                 auto ej = edge_order[j];
-                if (((permuted.src == ej.src) && (permuted.dst == ej.dst)) || ((permuted.src == ej.dst) && (permuted.dst == ej.src))) {
+                if (((permuted.src == ej.src) && (permuted.dst == ej.dst)) ||
+                    ((permuted.src == ej.dst) && (permuted.dst == ej.src))) {
                     sigma[i] = j;
                     success = true;
                     break;
@@ -166,12 +170,15 @@ std::vector<Permutation> generate_edge_automorphism(const std::vector<Permutatio
     return edge_automorphism;
 }
 
-void test_developments(const Graph& g, const std::vector<Permutation>& vertex_automorphism,
-                       std::string count_labeled_expect, std::string count_developments_expect) {
+void test_developments(const Graph& g,
+                       const std::vector<Permutation>& vertex_automorphism,
+                       std::string count_labeled_expect,
+                       std::string count_developments_expect) {
     // automorphism on edges
     GraphAuxiliary gaux(g);
     std::vector<Edge> edge_order = gaux.get_edge_order();
-    auto edge_automorphism = generate_edge_automorphism(vertex_automorphism, edge_order);
+    auto edge_automorphism =
+        generate_edge_automorphism(vertex_automorphism, edge_order);
 
     tdzdd::MessageHandler mh;
     mh.begin("delepments");
@@ -187,21 +194,23 @@ void test_developments(const Graph& g, const std::vector<Permutation>& vertex_au
     // sort permutations by max frontier sizes
     std::sort(edge_automorphism.begin(), edge_automorphism.end(),
               [](const Permutation& lhs, const Permutation& rhs) {
-                  auto size_lhs = PermutationFrontierManager(lhs).get_max_frontier_size();
-                  auto size_rhs = PermutationFrontierManager(rhs).get_max_frontier_size();
+                  auto size_lhs =
+                      PermutationFrontierManager(lhs).get_max_frontier_size();
+                  auto size_rhs =
+                      PermutationFrontierManager(rhs).get_max_frontier_size();
                   return size_lhs < size_rhs;
               });
 
     // enumerate unlabeled developments
     std::vector<isomorphism::IsomorphismElimination> symmetry_specs;
     symmetry_specs.reserve(edge_automorphism.size());
-    for (auto perm: edge_automorphism) {
+    for (auto perm : edge_automorphism) {
         PermutationFrontierManager pfm(perm);
         isomorphism::IsomorphismElimination symmetry_spec(pfm);
         symmetry_specs.emplace_back(symmetry_spec);
     }
 
-    for (auto spec: symmetry_specs) {
+    for (auto spec : symmetry_specs) {
         dd.zddSubset(spec);
         dd.zddReduce();
     }
@@ -212,8 +221,10 @@ void test_developments(const Graph& g, const std::vector<Permutation>& vertex_au
 
     auto count_developments_actual = dd.zddCardinality();
     if (count_developments_actual != count_developments_expect) {
-        std::cerr << "The cardinality of unlabeled developments is wrong: (actual, expect) = ("
-                  << count_developments_actual << ", " << count_developments_expect << ")" << std::endl;
+        std::cerr << "The cardinality of unlabeled developments is wrong: "
+                     "(actual, expect) = ("
+                  << count_developments_actual << ", "
+                  << count_developments_expect << ")" << std::endl;
         exit(1);
     }
 }
@@ -230,16 +241,17 @@ TEST(PermutationTest, TetrahedronTest) {
 
     // automorphism
     std::vector<Permutation> generators = {
-        std::vector<Element>{0, 2, 3, 1}, // C3
-        std::vector<Element>{1, 0, 3, 2}, // C2
-        std::vector<Element>{0, 1, 3, 2}, // m
+        std::vector<Element>{0, 2, 3, 1},  // C3
+        std::vector<Element>{1, 0, 3, 2},  // C2
+        std::vector<Element>{0, 1, 3, 2},  // m
     };
     auto vertex_automorphism = generate_group(generators);
     assert(vertex_automorphism.size() == 24);  // isomorphic to T_h
 
     auto count_labeled_expect = "16";
     auto count_developments_expect = "2";
-    test_developments(g, vertex_automorphism, count_labeled_expect, count_developments_expect);
+    test_developments(g, vertex_automorphism, count_labeled_expect,
+                      count_developments_expect);
 }
 
 TEST(PermutationTest, CubeTest) {
@@ -260,21 +272,23 @@ TEST(PermutationTest, CubeTest) {
 
     // automorphism
     std::vector<Permutation> generators = {
-        std::vector<Element>{0, 3, 7, 4, 1, 2, 6, 5}, // C3
-        std::vector<Element>{1, 2, 3, 0, 5, 6, 7, 4}, // C4
-        std::vector<Element>{1, 0, 3, 2, 5, 4, 7, 6}, // m
+        std::vector<Element>{0, 3, 7, 4, 1, 2, 6, 5},  // C3
+        std::vector<Element>{1, 2, 3, 0, 5, 6, 7, 4},  // C4
+        std::vector<Element>{1, 0, 3, 2, 5, 4, 7, 6},  // m
     };
     auto vertex_automorphism = generate_group(generators);
 
     size_t group_order_expect = 48;
-    assert(vertex_automorphism.size() == group_order_expect);  // isomorphic to O_h
+    assert(vertex_automorphism.size() ==
+           group_order_expect);  // isomorphic to O_h
 
     auto count_labeled_expect = "384";
     auto count_developments_expect = "11";
-    test_developments(g, vertex_automorphism, count_labeled_expect, count_developments_expect);
+    test_developments(g, vertex_automorphism, count_labeled_expect,
+                      count_developments_expect);
 }
 
-TEST(PermutationTest, dodecahedronTest){
+TEST(PermutationTest, dodecahedronTest) {
     int V = 20;
     Graph g(V);
     add_undirected_edge(g, 0, 1, 1);
@@ -310,24 +324,23 @@ TEST(PermutationTest, dodecahedronTest){
 
     // automorphism
     std::vector<Permutation> generators = {
-        std::vector<Element>{1, 2, 3, 4, 0,
-                             6, 7, 8, 9, 5,
-                             11, 12, 13, 14, 10,
-                             16, 17, 18, 19, 15}, // C5
-        std::vector<Element>{0, 4, 3, 2, 1,
-                             5, 9, 8, 7, 6,
-                             14, 13, 12, 11, 10,
-                             19, 18, 17, 16, 15}, // m
-        std::vector<Element>{0, 4, 9, 14, 5, 1, 3, 13, 19, 10, 2, 8, 18, 15, 6, 7, 12, 17, 16, 11}, // C3
+        std::vector<Element>{1,  2,  3,  4,  0,  6,  7,  8,  9,  5,
+                             11, 12, 13, 14, 10, 16, 17, 18, 19, 15},  // C5
+        std::vector<Element>{0,  4,  3,  2,  1,  5,  9,  8,  7,  6,
+                             14, 13, 12, 11, 10, 19, 18, 17, 16, 15},  // m
+        std::vector<Element>{0, 4, 9,  14, 5, 1, 3,  13, 19, 10,
+                             2, 8, 18, 15, 6, 7, 12, 17, 16, 11},  // C3
     };
-    auto vertex_automorphism = generate_group(generators);  // isomorphic to A5 x Z2
+    auto vertex_automorphism =
+        generate_group(generators);  // isomorphic to A5 x Z2
 
     size_t group_order_expect = 120;
     assert(vertex_automorphism.size() == group_order_expect);
 
     auto count_labeled_expect = "5184000";
     auto count_developments_expect = "43380";
-    test_developments(g, vertex_automorphism, count_labeled_expect, count_developments_expect);
+    test_developments(g, vertex_automorphism, count_labeled_expect,
+                      count_developments_expect);
 }
 
 TEST(PermutationTest, SmallTest) {

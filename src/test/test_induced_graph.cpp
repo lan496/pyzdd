@@ -7,15 +7,16 @@
 #include <tdzdd/DdStructure.hpp>
 
 #include "graph.hpp"
+#include "spec/induced_subgraph.hpp"
 #include "type.hpp"
 #include "utils.hpp"
-#include "spec/induced_subgraph.hpp"
 
 using namespace pyzdd;
 using namespace pyzdd::graph;
 using namespace pyzdd::graph::induced_subgraph;
 
-void check(const Graph& g, Weight target, std::string cardinality, const std::vector<std::vector<int>>& enumerated_expect, bool debug) {
+void check(const Graph& g, Weight target, std::string cardinality,
+           const std::vector<std::vector<int>>& enumerated_expect, bool debug) {
     VertexGraphFrontierManager vgfm(g);
     if (debug) {
         vgfm.dump(std::cerr);
@@ -34,7 +35,7 @@ void check(const Graph& g, Weight target, std::string cardinality, const std::ve
     assert(actual == cardinality);
 
     std::unordered_set<std::vector<int>, VectorHash<int>> uset_expect;
-    for (auto choice: enumerated_expect) {
+    for (auto choice : enumerated_expect) {
         uset_expect.insert(choice);
     }
 
@@ -58,16 +59,9 @@ void test1() {
     add_undirected_edge(g, 2, 1, -1);
     Weight target = 0;
 
-
     auto cardinality = "6";
     std::vector<std::vector<int>> enumerated_expect = {
-        {0, 0, 0},
-        {0, 1, 0},
-        {0, 0, 1},
-        {1, 0, 0},
-        {1, 1, 0},
-        {1, 1, 1}
-    };
+        {0, 0, 0}, {0, 1, 0}, {0, 0, 1}, {1, 0, 0}, {1, 1, 0}, {1, 1, 1}};
     check(g, target, cardinality, enumerated_expect, false);
 }
 
@@ -89,11 +83,7 @@ void test2() {
 
     auto cardinality = "4";
     std::vector<std::vector<int>> enumerated_expect = {
-        {0, 1, 1, 1},
-        {1, 0, 1, 1},
-        {1, 1, 0, 1},
-        {1, 1, 1, 0}
-    };
+        {0, 1, 1, 1}, {1, 0, 1, 1}, {1, 1, 0, 1}, {1, 1, 1, 0}};
     check(g, target, cardinality, enumerated_expect, false);
 }
 

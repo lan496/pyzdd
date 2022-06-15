@@ -2,8 +2,8 @@
 #define PYZDD_SPANNING_TREE_H
 
 #include <algorithm>
-#include <memory>
 #include <climits>
+#include <memory>
 #include <tdzdd/DdSpec.hpp>
 #include "../graph.hpp"
 #include "../type.hpp"
@@ -13,7 +13,7 @@ namespace graph {
 namespace spanning_forest {
 
 class FrontierData {
-public:
+   public:
     // degree of the vertex
     Vertex deg;
     // id of connected components contains the vertex
@@ -24,21 +24,23 @@ const Vertex UNUSED = -1;
 
 /// ZDD to represent spanning trees
 /// state[u] indicates the index of a connected component that u belongs to.
-class SpanningForestSpec: public tdzdd::PodArrayDdSpec<SpanningForestSpec, FrontierData, 2> {
+class SpanningForestSpec
+    : public tdzdd::PodArrayDdSpec<SpanningForestSpec, FrontierData, 2> {
     const Vertex V_;
     const int E_;
     const int max_frontier_size_;
     const GraphAuxiliary graphaux;
-public:
+
+   public:
     /// @param graphaux frontier manager of a graph
-    SpanningForestSpec(const GraphAuxiliary& graphaux) :
-        V_(graphaux.number_of_vertices()),
-        E_(graphaux.number_of_edges()),
-        max_frontier_size_(graphaux.get_max_frontier_size()),
-        graphaux(graphaux)
-    {
+    SpanningForestSpec(const GraphAuxiliary& graphaux)
+        : V_(graphaux.number_of_vertices()),
+          E_(graphaux.number_of_edges()),
+          max_frontier_size_(graphaux.get_max_frontier_size()),
+          graphaux(graphaux) {
         assert(std::is_pod<FrontierData>::value);
-        if (graphaux.number_of_vertices() > std::numeric_limits<Vertex>::max()) {
+        if (graphaux.number_of_vertices() >
+            std::numeric_limits<Vertex>::max()) {
             std::cerr << "The number of vertices should be smaller than "
                       << std::numeric_limits<Vertex>::max() << std::endl;
             exit(1);
@@ -63,7 +65,7 @@ public:
 
         // initialize Mate for introduced vertices
         const std::vector<Vertex>& introduced = graphaux.get_introduced(eid);
-        for (auto u: introduced) {
+        for (auto u : introduced) {
             set_deg(state, u, 0);
             set_comp(state, u, static_cast<Vertex>(u));
         }
@@ -93,7 +95,7 @@ public:
             // here, comp_src != comp_dst
             auto cmin = std::min(comp_src, comp_dst);
             auto cmax = std::max(comp_src, comp_dst);
-            for (auto uf: frontier) {
+            for (auto uf : frontier) {
                 if (get_comp(state, uf) == cmin) {
                     // choice cmax so that ComponentId does not decrease.
                     set_comp(state, uf, cmax);
@@ -108,14 +110,14 @@ public:
 
         // branch on determined vertex
         const std::vector<Vertex>& forgotten = graphaux.get_forgotten(eid);
-        for (auto v: forgotten) {
+        for (auto v : forgotten) {
             if (get_deg(state, v) == 0) {
                 // degree should be at least 1
                 return Terminal::REJECT;
             }
 
             bool comp_found = false;
-            for (auto w: frontier) {
+            for (auto w : frontier) {
                 // skip oneself
                 if (w == v) {
                     continue;
@@ -137,7 +139,7 @@ public:
         }
 
         // forget
-        for (auto u: forgotten) {
+        for (auto u : forgotten) {
             set_deg(state, u, 0);
             set_comp(state, u, UNUSED);
         }
@@ -158,24 +160,25 @@ public:
 
         os << "     frontier:";
         const auto& frontier = graphaux.get_frontier(eid);
-        for (auto u: frontier) {
+        for (auto u : frontier) {
             os << " " << u;
         }
         os << std::endl;
 
         os << "     deg     :";
-        for (auto u: frontier) {
+        for (auto u : frontier) {
             os << " " << get_deg(state, u);
         }
         os << std::endl;
 
         os << "     comp    :";
-        for (auto u: frontier) {
+        for (auto u : frontier) {
             os << " " << get_comp(state, u);
         }
         os << std::endl;
     }
-private:
+
+   private:
     Vertex get_deg(FrontierData* state, Vertex u) const {
         return state[graphaux.map_vertex_to_position(u)].deg;
     }
@@ -193,8 +196,8 @@ private:
     }
 };
 
-} // namespace spanning_tree
-} // namespace graph
-} // namesapce pyzdd
+}  // namespace spanning_forest
+}  // namespace graph
+}  // namespace pyzdd
 
-#endif // PYZDD_SPANNING_TREE_H
+#endif  // PYZDD_SPANNING_TREE_H

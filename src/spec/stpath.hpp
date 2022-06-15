@@ -2,8 +2,8 @@
 #define PYZDD_GRAPHSPEC_H
 
 #include <algorithm>
-#include <memory>
 #include <climits>
+#include <memory>
 #include <tdzdd/DdSpec.hpp>
 #include "../graph.hpp"
 #include "../type.hpp"
@@ -13,7 +13,7 @@ namespace graph {
 namespace stpath {
 
 class FrontierData {
-public:
+   public:
     // degree of the vertex
     Vertex deg;
     // id of connected components contains the vertex
@@ -21,7 +21,8 @@ public:
 };
 
 // ZDD to represent simple paths from s to t
-class SimpleSTPath: public tdzdd::PodArrayDdSpec<SimpleSTPath, FrontierData, 2> {
+class SimpleSTPath
+    : public tdzdd::PodArrayDdSpec<SimpleSTPath, FrontierData, 2> {
     const Vertex V_;
     const Vertex s_;
     const Vertex t_;
@@ -67,24 +68,25 @@ class SimpleSTPath: public tdzdd::PodArrayDdSpec<SimpleSTPath, FrontierData, 2> 
         return false;
     }
 
-public:
-    SimpleSTPath(const GraphAuxiliary& graphaux, Vertex s, Vertex t) :
-        V_(graphaux.number_of_vertices()),
-        s_(s),
-        t_(t),
-        E_(graphaux.number_of_edges()),
-        max_frontier_size_(graphaux.get_max_frontier_size()),
-        s_introduced_level_(graphaux.get_vertex_introduced_level(s)),
-        t_introduced_level_(graphaux.get_vertex_introduced_level(t)),
-        graphaux(graphaux)
-    {
+   public:
+    SimpleSTPath(const GraphAuxiliary& graphaux, Vertex s, Vertex t)
+        : V_(graphaux.number_of_vertices()),
+          s_(s),
+          t_(t),
+          E_(graphaux.number_of_edges()),
+          max_frontier_size_(graphaux.get_max_frontier_size()),
+          s_introduced_level_(graphaux.get_vertex_introduced_level(s)),
+          t_introduced_level_(graphaux.get_vertex_introduced_level(t)),
+          graphaux(graphaux) {
         assert(std::is_pod<FrontierData>::value);
         if (graphaux.number_of_vertices() > SHRT_MAX) {
-            std::cerr << "The number of vertices should be smaller than " << SHRT_MAX << std::endl;
+            std::cerr << "The number of vertices should be smaller than "
+                      << SHRT_MAX << std::endl;
             exit(1);
         }
         if (s == t) {
-            std::cerr << "The endpoints s and t should be different." << std::endl;
+            std::cerr << "The endpoints s and t should be different."
+                      << std::endl;
             exit(1);
         }
 
@@ -104,15 +106,15 @@ public:
 
         // initialize FrontierData for introduced vertices
         const std::vector<Vertex>& introduced = graphaux.get_introduced(eid);
-        for (const auto v: introduced) {
+        for (const auto v : introduced) {
             set_deg(state, v, 0);
             // initially introduced vertex is an isolated component
             set_comp(state, v, v);
         }
 
         // std::cerr << std::endl;
-        // std::cerr << "# call eid=" << eid << ", value=" << value << std::endl;
-        // std::cerr << "before processing edge" << std::endl;
+        // std::cerr << "# call eid=" << eid << ", value=" << value <<
+        // std::endl; std::cerr << "before processing edge" << std::endl;
         // print_state(state, level);
 
         // update state
@@ -127,7 +129,7 @@ public:
                 // merge components cs and cd
                 Vertex cmin = std::min(cs, cd);
                 Vertex cmax = std::max(cs, cd);
-                for (auto v: frontier) {
+                for (auto v : frontier) {
                     // choice cmax so that `comp` does not decrease.
                     if (get_comp(state, v) == cmin) {
                         set_comp(state, v, cmax);
@@ -166,7 +168,7 @@ public:
             // the other connected component than u
             bool comp_found = false;
             bool deg_found = false;
-            for (Vertex w_frontier: frontier) {
+            for (Vertex w_frontier : frontier) {
                 // skip oneself
                 if (w_frontier == v) {
                     continue;
@@ -201,8 +203,10 @@ public:
                 if (get_deg(state, v) > 0 && deg_found) {
                     return Terminal::REJECT;
                 } else if (get_deg(state, v) > 0) {
-                    // s or t cannot belong to the same components of u. contradiction.
-                    if (level > s_introduced_level_ || level > t_introduced_level_) {
+                    // s or t cannot belong to the same components of u.
+                    // contradiction.
+                    if (level > s_introduced_level_ ||
+                        level > t_introduced_level_) {
                         return Terminal::REJECT;
                     } else {
                         // s-t path already completes
@@ -228,8 +232,9 @@ public:
 
         std::cerr << "[frontier, deg, comp]" << std::endl;
         const auto& frontier = graphaux.get_frontier(eid);
-        for (auto u: frontier) {
-            std::cerr << u << " " << get_deg(state, u) << " " << get_comp(state, u) << std::endl;
+        for (auto u : frontier) {
+            std::cerr << u << " " << get_deg(state, u) << " "
+                      << get_comp(state, u) << std::endl;
         }
 
         std::cerr << "deg :";
@@ -245,8 +250,8 @@ public:
     }
 };
 
-} // namespace stpath
-} // namesapce graph
-} // namespace pyzdd
+}  // namespace stpath
+}  // namespace graph
+}  // namespace pyzdd
 
 #endif  // PYZDD_GRAPHSPEC_H

@@ -6,8 +6,8 @@
 #include <tdzdd/DdStructure.hpp>
 
 #include "graph.hpp"
-#include "type.hpp"
 #include "spec/stpath.hpp"
+#include "type.hpp"
 
 using namespace pyzdd;
 using namespace pyzdd::graph;
@@ -53,7 +53,8 @@ TEST(StPathTest, GridGraphTest) {
         int t = n * n - 1;
         auto gaux = GraphAuxiliary(g);
         // gaux.print();
-        std::cerr << "Frontier size: " << gaux.get_max_frontier_size() << std::endl;
+        std::cerr << "Frontier size: " << gaux.get_max_frontier_size()
+                  << std::endl;
 
         auto spec = SimpleSTPath(gaux, s, t);
 
@@ -69,7 +70,8 @@ TEST(StPathTest, GridGraphTest) {
 
         auto actual = dd.zddCardinality();
         auto expect = ans[n - 2];
-        std::cerr << "n = " << n << ", # of solutions = " << dd.zddCardinality() << std::endl;
+        std::cerr << "n = " << n << ", # of solutions = " << dd.zddCardinality()
+                  << std::endl;
 
         /*
         std::ofstream output("debug.dot");

@@ -1,15 +1,15 @@
+#include <cassert>
 #include <iostream>
 #include <unordered_set>
-#include <cassert>
 
 #include <gtest/gtest.h>
 #include <tdzdd/DdSpec.hpp>
 #include <tdzdd/DdStructure.hpp>
 
-#include <permutation.hpp>
-#include <type.hpp>
 #include <graph.hpp>
+#include <permutation.hpp>
 #include <spec/superperiodic.hpp>
+#include <type.hpp>
 
 using namespace pyzdd;
 using namespace pyzdd::permutation;
@@ -21,7 +21,7 @@ struct VectorHash {
         std::hash<superperiodic::BinaryColor> hasher;
         size_t seed = 0;
         for (auto i : v) {
-            seed ^= hasher(i) + 0x9e3779b9 + (seed<<6) + (seed>>2);
+            seed ^= hasher(i) + 0x9e3779b9 + (seed << 6) + (seed >> 2);
         }
         return seed;
     }
@@ -45,29 +45,29 @@ std::string check_enumerated(const Permutation& perm) {
     std::cerr << "# of solutions: " << actual << std::endl;
 #endif
 
-    #ifdef _DEBUG
+#ifdef _DEBUG
     std::ofstream output("debug.dot");
     dd.dumpDot(output);
-    #endif
+#endif
 
     using Coloring = std::vector<superperiodic::BinaryColor>;
     size_t n = perm.get_size();
 
     auto expect = superperiodic::brute_force_superperiodic_elimination(perm);
     if (actual != std::to_string(expect.size())) {
-        std::cerr << "The cardinality is wrong: (actual, expect) = ("
-                  << actual << ", " << expect.size() << ")" << std::endl;
+        std::cerr << "The cardinality is wrong: (actual, expect) = (" << actual
+                  << ", " << expect.size() << ")" << std::endl;
         exit(1);
     }
     std::unordered_set<Coloring, VectorHash> uset_expect;
-    for (auto coloring: expect) {
+    for (auto coloring : expect) {
         uset_expect.insert(coloring);
     }
 
     std::unordered_set<Coloring, VectorHash> uset_actual;
     for (auto itr = dd.begin(), end = dd.end(); itr != end; ++itr) {
         Coloring choice(n, 0);
-        for (auto level: *itr) {
+        for (auto level : *itr) {
             choice[n - level] = 1;
         }
         uset_actual.insert(choice);
@@ -75,18 +75,18 @@ std::string check_enumerated(const Permutation& perm) {
 
     if (uset_actual != uset_expect) {
         std::cerr << "DD" << std::endl;
-        for (auto choice: uset_actual) {
+        for (auto choice : uset_actual) {
             std::cerr << "  ";
-            for (auto c: choice) {
+            for (auto c : choice) {
                 std::cerr << static_cast<int>(c);
             }
             std::cerr << std::endl;
         }
 
         std::cerr << "brute force" << std::endl;
-        for (auto choice: uset_expect) {
+        for (auto choice : uset_expect) {
             std::cerr << "  ";
-            for (auto c: choice) {
+            for (auto c : choice) {
                 std::cerr << static_cast<int>(c);
             }
             std::cerr << std::endl;
@@ -99,7 +99,8 @@ std::string check_enumerated(const Permutation& perm) {
 
 void test1() {
     auto perm = Permutation(std::vector<Element>{2, 1, 0});
-    std::string cardinality_expect = "4"; // [1, 0, 0], [1, 1, 0], [0, 0, 1], [0, 1, 1]
+    std::string cardinality_expect =
+        "4";  // [1, 0, 0], [1, 1, 0], [0, 0, 1], [0, 1, 1]
     auto actual = check_enumerated(perm);
     assert(actual == cardinality_expect);
 }

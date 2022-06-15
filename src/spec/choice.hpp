@@ -1,9 +1,9 @@
 #ifndef PYZDD_CHOISE_H
 #define PYZDD_CHOISE_H
 
-#include <vector>
 #include <algorithm>
 #include <limits>
+#include <vector>
 
 #include <tdzdd/DdSpec.hpp>
 #include <tdzdd/DdStructure.hpp>
@@ -15,7 +15,7 @@ namespace choice {
 using Variable = int;
 
 /// @brief DD specification for k-combinations out of n elements
-class Choice: public tdzdd::DdSpec<Choice, int, 2> {
+class Choice : public tdzdd::DdSpec<Choice, int, 2> {
     /// number of variables
     int n;
     /// number of selected variables
@@ -25,23 +25,19 @@ class Choice: public tdzdd::DdSpec<Choice, int, 2> {
     /// if true, allow to take more than k
     bool allow_more_than;
 
-public:
+   public:
     Choice() = delete;
     Choice(const Choice&) = default;
 
-    Choice(int n, int k, const std::vector<int>& v, bool allow_more_than) :
-        n(n),
-        k(k),
-        group(v),
-        allow_more_than(allow_more_than)
-    {
+    Choice(int n, int k, const std::vector<int>& v, bool allow_more_than)
+        : n(n), k(k), group(v), allow_more_than(allow_more_than) {
         if (n > std::numeric_limits<int>::max()) {
             std::cerr << "The number of vertices should be smaller than "
                       << std::numeric_limits<int>::max() << std::endl;
             exit(1);
         }
 
-        for (auto vv: v) {
+        for (auto vv : v) {
             if ((vv < 0) || (vv >= n)) {
                 std::cerr << "v has an invalid variable: " << vv << std::endl;
                 exit(1);
@@ -60,17 +56,20 @@ public:
         Variable idx = n - level;
         auto bounds = std::equal_range(group.begin(), group.end(), idx);
         if (bounds.second - bounds.first != 0) {
-            // once the number of choices exceeds k, we do not need to count the excesses
+            // once the number of choices exceeds k, we do not need to count the
+            // excesses
             state = std::min(state + value, k + 1);
         }
 
         --level;
-        if (level == 0) return satisfy(state) ? Terminal::ACCEPT : Terminal::REJECT;
+        if (level == 0)
+            return satisfy(state) ? Terminal::ACCEPT : Terminal::REJECT;
         if (!allow_more_than && (state > k)) return Terminal::REJECT;
         if (state + (group.end() - bounds.second) < k) return Terminal::REJECT;
         return level;
     }
-private:
+
+   private:
     bool satisfy(int state) const {
         if (allow_more_than) {
             return state >= k;
@@ -87,10 +86,11 @@ struct TakeBothState {
 
 /// @brief DD specification for combinations except all zeros and all ones.
 /// @note width of DD is at most 3
-class TakeBoth: public tdzdd::DdSpec<TakeBoth, TakeBothState, 2> {
+class TakeBoth : public tdzdd::DdSpec<TakeBoth, TakeBothState, 2> {
     /// number of variables
     const int n_;
-public:
+
+   public:
     TakeBoth() = delete;
     TakeBoth(const TakeBoth&) = default;
 
@@ -124,10 +124,11 @@ public:
     }
 
     bool equalTo(const TakeBothState& lhs, const TakeBothState& rhs) const {
-        return ((lhs.take_zero == rhs.take_zero) and (lhs.take_one == rhs.take_one));
+        return ((lhs.take_zero == rhs.take_zero) and
+                (lhs.take_one == rhs.take_one));
     }
 
-private:
+   private:
     void reset_state(TakeBothState& state) const {
         state.take_zero = false;
         state.take_one = false;
@@ -138,13 +139,11 @@ private:
     }
 };
 
-std::vector<std::vector<Variable>> brute_force_choice(int n,
-                                                      int k,
-                                                      const std::vector<Variable>& group,
-                                                      bool allow_more_than)
-{
+std::vector<std::vector<Variable>> brute_force_choice(
+    int n, int k, const std::vector<Variable>& group, bool allow_more_than) {
     if (n > 64) {
-        std::cerr << "The current implementation does not support n > 64." << std::endl;
+        std::cerr << "The current implementation does not support n > 64."
+                  << std::endl;
     }
 
     std::vector<std::vector<Variable>> combs;
@@ -152,7 +151,8 @@ std::vector<std::vector<Variable>> brute_force_choice(int n,
         std::vector<Variable> comb;
         int count = 0;
         for (size_t i = 0; i < static_cast<size_t>(n); ++i) {
-            bool take = static_cast<bool>((bits >> i) & (static_cast<uint64_t>(1)));
+            bool take =
+                static_cast<bool>((bits >> i) & (static_cast<uint64_t>(1)));
             if (take) {
                 comb.emplace_back(i);
                 auto bounds = std::equal_range(group.begin(), group.end(), i);
@@ -171,6 +171,6 @@ std::vector<std::vector<Variable>> brute_force_choice(int n,
     return combs;
 }
 
-} // namespace choice
-} // namespace pyzdd
-#endif // PYZDD_CHOISE_H
+}  // namespace choice
+}  // namespace pyzdd
+#endif  // PYZDD_CHOISE_H

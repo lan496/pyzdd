@@ -1,25 +1,25 @@
+#include <cassert>
 #include <iostream>
 #include <unordered_set>
-#include <cassert>
 
 #include <gtest/gtest.h>
 #include <tdzdd/DdSpec.hpp>
 #include <tdzdd/DdStructure.hpp>
 
-#include <type.hpp>
 #include <spec/combination.hpp>
+#include <type.hpp>
 
 using namespace pyzdd;
 using namespace pyzdd::combination;
 
 // https://stackoverflow.com/questions/29855908/c-unordered-set-of-vectors
-template<typename T>
+template <typename T>
 struct VectorHash {
     size_t operator()(const std::vector<T>& v) const {
         std::hash<T> hasher;
         size_t seed = 0;
         for (auto i : v) {
-            seed ^= hasher(i) + 0x9e3779b9 + (seed<<6) + (seed>>2);
+            seed ^= hasher(i) + 0x9e3779b9 + (seed << 6) + (seed >> 2);
         }
         return seed;
     }
@@ -44,19 +44,19 @@ std::string check_enumerated(int n, int k) {
 
     auto expect = brute_force_combination(n, k);
     if (actual != std::to_string(expect.size())) {
-        std::cerr << "The cardinality is wrong: (actual, expect) = ("
-                  << actual << ", " << expect.size() << ")" << std::endl;
+        std::cerr << "The cardinality is wrong: (actual, expect) = (" << actual
+                  << ", " << expect.size() << ")" << std::endl;
         exit(1);
     }
     std::unordered_set<std::vector<int>, VectorHash<int>> uset_expect;
-    for (auto coloring: expect) {
+    for (auto coloring : expect) {
         uset_expect.insert(coloring);
     }
 
     std::unordered_set<std::vector<int>, VectorHash<int>> uset_actual;
     for (auto itr = dd.begin(), end = dd.end(); itr != end; ++itr) {
         std::vector<int> choice;
-        for (auto level: *itr) {
+        for (auto level : *itr) {
             choice.emplace_back(n - level);
         }
         uset_actual.insert(choice);
@@ -64,18 +64,18 @@ std::string check_enumerated(int n, int k) {
 
     if (uset_actual != uset_expect) {
         std::cerr << "DD" << std::endl;
-        for (auto choice: uset_actual) {
+        for (auto choice : uset_actual) {
             std::cerr << "  ";
-            for (auto c: choice) {
+            for (auto c : choice) {
                 std::cerr << c;
             }
             std::cerr << std::endl;
         }
 
         std::cerr << "brute force" << std::endl;
-        for (auto choice: uset_expect) {
+        for (auto choice : uset_expect) {
             std::cerr << "  ";
-            for (auto c: choice) {
+            for (auto c : choice) {
                 std::cerr << c;
             }
             std::cerr << std::endl;

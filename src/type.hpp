@@ -11,6 +11,6 @@ enum Terminal {
     REJECT = 0,
 };
 
-} // namespace pyzdd
+}  // namespace pyzdd
 
-#endif // PYZDD_TYPE_H
+#endif  // PYZDD_TYPE_H

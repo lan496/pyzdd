@@ -1,13 +1,13 @@
 #ifndef PYZDD_GRAPH_H
 #define PYZDD_GRAPH_H
 
+#include <algorithm>
+#include <cassert>
 #include <iostream>
-#include <vector>
+#include <limits>
 #include <queue>
 #include <set>
-#include <algorithm>
-#include <limits>
-#include <cassert>
+#include <vector>
 #include "type.hpp"
 
 namespace pyzdd {
@@ -22,14 +22,14 @@ struct Edge {
     Vertex src, dst;
     Weight weight;
     Edge() {}
-    Edge(Vertex src, Vertex dst) :
-        src(src), dst(dst), weight(1) {}
-    Edge(Vertex src, Vertex dst, Weight weight) :
-        src(src), dst(dst), weight(weight) {}
+    Edge(Vertex src, Vertex dst) : src(src), dst(dst), weight(1) {}
+    Edge(Vertex src, Vertex dst, Weight weight)
+        : src(src), dst(dst), weight(weight) {}
 };
 
 bool operator==(const Edge& lhs, const Edge& rhs) {
-    return (lhs.src == rhs.src) && (lhs.dst == rhs.dst) && (lhs.weight == rhs.weight);
+    return (lhs.src == rhs.src) && (lhs.dst == rhs.dst) &&
+           (lhs.weight == rhs.weight);
 }
 
 std::ostream& operator<<(std::ostream& os, const Edge& e) {
@@ -41,16 +41,16 @@ using Edges = std::vector<Edge>;
 using Graph = std::vector<Edges>;
 
 /// @brief add undirected edge {u, v} with weight w into graph
-void add_undirected_edge(Graph &graph, Vertex u, Vertex v, Weight w) {
+void add_undirected_edge(Graph& graph, Vertex u, Vertex v, Weight w) {
     graph[u].emplace_back(Edge(u, v, w));
     graph[v].emplace_back(Edge(v, u, w));
 }
 
-int get_number_of_edges(const Graph &undirected_graph) {
+int get_number_of_edges(const Graph& undirected_graph) {
     int V = undirected_graph.size();
     int E = 0;
     for (Vertex u = 0; u < static_cast<Vertex>(V); ++u) {
-        for (auto& e: undirected_graph[u]) {
+        for (auto& e : undirected_graph[u]) {
             if (e.dst > u) {
                 ++E;
             }
@@ -65,7 +65,7 @@ bool is_simple_graph(const Graph& graph) {
     for (Vertex u = 0; u < V; ++u) {
         // check no multiedge
         std::set<Vertex> dsts;
-        for (auto& e: graph[u]) {
+        for (auto& e : graph[u]) {
             dsts.insert(e.dst);
         }
         if (dsts.size() != graph[u].size()) {
@@ -73,7 +73,7 @@ bool is_simple_graph(const Graph& graph) {
         }
 
         // check no self-edge
-        for (auto& e: graph[u]) {
+        for (auto& e : graph[u]) {
             if (e.dst == u) {
                 return false;
             }
@@ -92,7 +92,7 @@ using FrontierPosition = Vertex;
 /// @brief Frontier manager for ZDD represeting edge-induced subgraphs
 /// TODO: rename to EdgeGraphFrontierManager
 class GraphAuxiliary {
-private:
+   private:
     /// number of vertices
     size_t V_;
     /// number of edges
@@ -101,12 +101,14 @@ private:
     /// edge_order: InternalEdgeId -> Edge
     std::vector<Edge> edge_order_;
 
-    /// Just before processing the i-th edge, the states of vertices of frontiers[i] are required.
-    /// For each i, frontiers_[i] is sorted by ascending order.
+    /// Just before processing the i-th edge, the states of vertices of
+    /// frontiers[i] are required. For each i, frontiers_[i] is sorted by
+    /// ascending order.
     std::vector<std::vector<Vertex>> frontiers_;
     /// When processing the i-the edge, vertices introduced[i] enter.
     std::vector<std::vector<Vertex>> introduced_;
-    /// After processing the i-th edge, vertices forgotten[i] are no more needed.
+    /// After processing the i-th edge, vertices forgotten[i] are no more
+    /// needed.
     std::vector<std::vector<Vertex>> forgotten_;
 
     /// mapping_vertex_pos_[v] is position of vertex v in frontiers
@@ -114,9 +116,10 @@ private:
 
     /// the maximum size of frontiers
     int max_frontier_size_;
-public:
+
+   public:
     GraphAuxiliary() {}
-    GraphAuxiliary(const Graph& graph) : V_(graph.size())  {
+    GraphAuxiliary(const Graph& graph) : V_(graph.size()) {
         // sanity check on graph
         assert(is_simple_graph(graph));
         for (Vertex u = 0; u < static_cast<Vertex>(V_); ++u) {
@@ -127,14 +130,15 @@ public:
         }
 
         if (V_ > SHRT_MAX) {
-            std::cerr << "The number of vertices should be smaller than " << SHRT_MAX << std::endl;
+            std::cerr << "The number of vertices should be smaller than "
+                      << SHRT_MAX << std::endl;
             exit(1);
         }
 
         // number of edges
         E_ = 0;
         for (Vertex u = 0; u < static_cast<Vertex>(V_); ++u) {
-            for (auto& e: graph[u]) {
+            for (auto& e : graph[u]) {
                 if (e.dst > u) {
                     ++E_;
                 }
@@ -148,20 +152,19 @@ public:
     }
 
     /// @brief prepare frontiers with a given varible order.
-    GraphAuxiliary(const Graph& graph, const std::vector<Edge>& edge_order) :
-        V_(graph.size()),
-        edge_order_(edge_order)
-    {
+    GraphAuxiliary(const Graph& graph, const std::vector<Edge>& edge_order)
+        : V_(graph.size()), edge_order_(edge_order) {
         assert(is_simple_graph(graph));
         if (V_ > SHRT_MAX) {
-            std::cerr << "The number of vertices should be smaller than " << SHRT_MAX << std::endl;
+            std::cerr << "The number of vertices should be smaller than "
+                      << SHRT_MAX << std::endl;
             exit(1);
         }
 
         // number of edges
         E_ = 0;
         for (Vertex u = 0; u < static_cast<Vertex>(V_); ++u) {
-            for (auto& e: graph[u]) {
+            for (auto& e : graph[u]) {
                 if (e.dst > u) {
                     ++E_;
                 }
@@ -180,7 +183,7 @@ public:
         for (Vertex u = 0; u < V; ++u) {
             // check no multiedge
             std::set<Vertex> dsts;
-            for (auto& e: graph[u]) {
+            for (auto& e : graph[u]) {
                 dsts.insert(e.dst);
             }
             if (dsts.size() != graph[u].size()) {
@@ -188,7 +191,7 @@ public:
             }
 
             // check no self-edge
-            for (auto& e: graph[u]) {
+            for (auto& e : graph[u]) {
                 if (e.dst == u) {
                     return false;
                 }
@@ -197,25 +200,15 @@ public:
         return true;
     }
 
-    size_t number_of_vertices() const {
-        return V_;
-    }
+    size_t number_of_vertices() const { return V_; }
 
-    size_t number_of_edges() const {
-        return E_;
-    }
+    size_t number_of_edges() const { return E_; }
 
-    size_t get_max_frontier_size() const {
-        return max_frontier_size_;
-    }
+    size_t get_max_frontier_size() const { return max_frontier_size_; }
 
-    const std::vector<Edge>& get_edge_order() const {
-        return edge_order_;
-    }
+    const std::vector<Edge>& get_edge_order() const { return edge_order_; }
 
-    const Edge& get_edge(InternalEdgeId eid) const {
-        return edge_order_[eid];
-    }
+    const Edge& get_edge(InternalEdgeId eid) const { return edge_order_[eid]; }
 
     const std::vector<Vertex>& get_frontier(InternalEdgeId eid) const {
         return frontiers_[eid];
@@ -236,7 +229,7 @@ public:
     pyzdd::Level get_vertex_introduced_level(Vertex u) const {
         InternalEdgeId E = number_of_edges();
         for (InternalEdgeId eid = 0; eid < E; ++eid) {
-            for (const Vertex &ve: get_introduced(eid)) {
+            for (const Vertex& ve : get_introduced(eid)) {
                 if (ve == u) return E - eid;
             }
         }
@@ -252,7 +245,7 @@ public:
         os << "frontiers" << std::endl;
         for (InternalEdgeId eid = 0; eid < E; ++eid) {
             os << "     " << eid << ":";
-            for (const auto& u: get_frontier(eid)) {
+            for (const auto& u : get_frontier(eid)) {
                 os << " " << u;
             }
             os << std::endl;
@@ -260,7 +253,7 @@ public:
         os << "introduced" << std::endl;
         for (InternalEdgeId eid = 0; eid < E; ++eid) {
             os << "     " << eid << ":";
-            for (const auto& u: get_introduced(eid)) {
+            for (const auto& u : get_introduced(eid)) {
                 os << " " << u;
             }
             os << std::endl;
@@ -268,7 +261,7 @@ public:
         os << "forgotten" << std::endl;
         for (InternalEdgeId eid = 0; eid < E; ++eid) {
             os << "     " << eid << ":";
-            for (const auto& u: get_forgotten(eid)) {
+            for (const auto& u : get_forgotten(eid)) {
                 os << " " << u;
             }
             os << std::endl;
@@ -281,10 +274,9 @@ public:
     }
 
     /// @deprecated
-    void print() const {
-        dump(std::cerr);
-    }
-private:
+    void print() const { dump(std::cerr); }
+
+   private:
     /// @brief determine variable order by BFS
     /// @return bool true iff the graph is connected.
     void order_edges(const Graph& graph) {
@@ -301,12 +293,13 @@ private:
             std::queue<Vertex> que;
             que.push(u);
             while (!que.empty()) {
-                Vertex v = que.front(); que.pop();
+                Vertex v = que.front();
+                que.pop();
                 if (visited_vertex[v]) {
                     continue;
                 }
                 visited_vertex[v] = true;
-                for (auto e: graph[v]) {
+                for (auto e : graph[v]) {
                     if (!visited_vertex[e.dst]) {
                         edge_order_[edge_count++] = e;
                         que.push(e.dst);
@@ -371,15 +364,15 @@ private:
         std::set<Vertex> bag;
         for (InternalEdgeId eid = 0; eid < E; ++eid) {
             // introduced vertices
-            for (auto v: introduced_[eid]) {
+            for (auto v : introduced_[eid]) {
                 bag.insert(v);
             }
             // determine frontier
-            for (auto v: bag) {
+            for (auto v : bag) {
                 frontiers_[eid].emplace_back(v);
             }
             // forgotten vertices
-            for (auto v: forgotten_[eid]) {
+            for (auto v : forgotten_[eid]) {
                 bag.erase(v);
             }
         }
@@ -387,8 +380,9 @@ private:
 
         // frontier size
         max_frontier_size_ = 0;
-        for (const auto& f: frontiers_) {
-            max_frontier_size_ = std::max(static_cast<int>(f.size()), max_frontier_size_);
+        for (const auto& f : frontiers_) {
+            max_frontier_size_ =
+                std::max(static_cast<int>(f.size()), max_frontier_size_);
         }
 
         // map vertex to position
@@ -397,7 +391,7 @@ private:
         std::vector<bool> used(max_frontier_size_, false);
         for (InternalEdgeId eid = 0; eid < E; ++eid) {
             // introduce vertex
-            for (auto u: introduced_[eid]) {
+            for (auto u : introduced_[eid]) {
                 bool success = false;
                 for (FrontierPosition i = 0; i < max_frontier_size_; ++i) {
                     if (!used[i]) {
@@ -410,7 +404,7 @@ private:
                 assert(success);
             }
             // forget vertex
-            for (auto u: forgotten_[eid]) {
+            for (auto u : forgotten_[eid]) {
                 FrontierPosition released = mapping_vertex_pos_[u];
                 used[released] = false;
             }
@@ -423,7 +417,6 @@ private:
         }
     }
 };
-
 
 /// @brief determine variable order by BFS
 std::vector<Vertex> get_vertex_order_by_bfs(const Graph& graph) {
@@ -439,13 +432,14 @@ std::vector<Vertex> get_vertex_order_by_bfs(const Graph& graph) {
         std::queue<Vertex> que;
         que.push(u);
         while (!que.empty()) {
-            Vertex v = que.front(); que.pop();
+            Vertex v = que.front();
+            que.pop();
             if (visited_vertex[v]) {
                 continue;
             }
             visited_vertex[v] = true;
             vertex_order[vertex_count++] = v;
-            for (auto e: graph[v]) {
+            for (auto e : graph[v]) {
                 if (!visited_vertex[e.dst]) {
                     que.push(e.dst);
                 }
@@ -457,10 +451,9 @@ std::vector<Vertex> get_vertex_order_by_bfs(const Graph& graph) {
     return vertex_order;
 }
 
-
 /// @brief Frontier manager for ZDD represeting vertex-induced subgraphs
 class VertexGraphFrontierManager {
-private:
+   private:
     /// number of vertices
     size_t V_;
     /// number of edges
@@ -474,13 +467,15 @@ private:
     /// mapping_vertex: Vertex -> InternalVertexId
     std::vector<InternalVertexId> mapping_vertex_;
 
-    /// Just before processing the i-th vertex, the states of vertices of frontiers[i] are required.
-    /// For each i, frontiers_[i] is sorted by ascending order.
+    /// Just before processing the i-th vertex, the states of vertices of
+    /// frontiers[i] are required. For each i, frontiers_[i] is sorted by
+    /// ascending order.
     std::vector<std::vector<Vertex>> frontiers_;
     /// After processing the i-th vertex, processed_[i] can also be processed.
     /// processed_: InternalVertexId -> [Edge]
     std::vector<std::vector<Edge>> processed_;
-    /// After processing the i-th vertex, vertices forgotten[i] are no more needed.
+    /// After processing the i-th vertex, vertices forgotten[i] are no more
+    /// needed.
     std::vector<std::vector<Vertex>> forgotten_;
 
     /// mapping_vertex_pos_[v] is position of vertex v in frontiers
@@ -488,25 +483,27 @@ private:
 
     /// the maximum size of frontiers
     int max_frontier_size_;
-public:
+
+   public:
     VertexGraphFrontierManager() {}
-    VertexGraphFrontierManager(const Graph& graph) :
-        V_(graph.size()),
-        E_(get_number_of_edges(graph)),
-        graph_(graph),
-        vertex_order_(get_vertex_order_by_bfs(graph))
-    {
+    VertexGraphFrontierManager(const Graph& graph)
+        : V_(graph.size()),
+          E_(get_number_of_edges(graph)),
+          graph_(graph),
+          vertex_order_(get_vertex_order_by_bfs(graph)) {
         // sanity check on graph
         assert(is_simple_graph(graph_));
 
         if (V_ > std::numeric_limits<Vertex>::max()) {
-            std::cerr << "The number of vertices should be smaller than " << std::numeric_limits<Vertex>::max() << std::endl;
+            std::cerr << "The number of vertices should be smaller than "
+                      << std::numeric_limits<Vertex>::max() << std::endl;
             exit(1);
         }
 
         // mapping_vertex_
         mapping_vertex_.resize(V_);
-        for (InternalVertexId vid = 0; vid < static_cast<InternalVertexId>(V_); ++vid) {
+        for (InternalVertexId vid = 0; vid < static_cast<InternalVertexId>(V_);
+             ++vid) {
             mapping_vertex_[vertex_order_[vid]] = vid;
         }
 
@@ -515,22 +512,24 @@ public:
     }
 
     /// @brief prepare frontiers with a given variable order.
-    VertexGraphFrontierManager(const Graph& graph, const std::vector<Vertex>& vertex_order) :
-        V_(graph.size()),
-        E_(get_number_of_edges(graph)),
-        graph_(graph),
-        vertex_order_(vertex_order)
-    {
+    VertexGraphFrontierManager(const Graph& graph,
+                               const std::vector<Vertex>& vertex_order)
+        : V_(graph.size()),
+          E_(get_number_of_edges(graph)),
+          graph_(graph),
+          vertex_order_(vertex_order) {
         assert(is_simple_graph(graph_));
         if (V_ > std::numeric_limits<Vertex>::max()) {
-            std::cerr << "The number of vertices should be smaller than " << std::numeric_limits<Vertex>::max() << std::endl;
+            std::cerr << "The number of vertices should be smaller than "
+                      << std::numeric_limits<Vertex>::max() << std::endl;
             exit(1);
         }
 
         // mapping_vertex_
         assert(vertex_order_.size() == V_);
         mapping_vertex_.resize(V_);
-        for (InternalVertexId vid = 0; vid < static_cast<InternalVertexId>(V_); ++vid) {
+        for (InternalVertexId vid = 0; vid < static_cast<InternalVertexId>(V_);
+             ++vid) {
             mapping_vertex_[vertex_order_[vid]] = vid;
         }
 
@@ -538,17 +537,11 @@ public:
         construct_frontiers();
     }
 
-    size_t number_of_vertices() const {
-        return V_;
-    }
+    size_t number_of_vertices() const { return V_; }
 
-    size_t number_of_edges() const {
-        return E_;
-    }
+    size_t number_of_edges() const { return E_; }
 
-    size_t get_max_frontier_size() const {
-        return max_frontier_size_;
-    }
+    size_t get_max_frontier_size() const { return max_frontier_size_; }
 
     const std::vector<Vertex>& get_vertex_order() const {
         return vertex_order_;
@@ -593,7 +586,7 @@ public:
         os << "frontiers" << std::endl;
         for (InternalVertexId vid = 0; vid < V; ++vid) {
             os << "     " << vid << "(v=" << get_vertex(vid) << "):";
-            for (const auto& u: get_frontier(vid)) {
+            for (const auto& u : get_frontier(vid)) {
                 os << " " << u;
             }
             os << std::endl;
@@ -602,7 +595,7 @@ public:
         os << "processed edges" << std::endl;
         for (InternalVertexId vid = 0; vid < V; ++vid) {
             os << "     " << vid << "(v=" << get_vertex(vid) << "):";
-            for (const auto& e: get_processed_edges(vid)) {
+            for (const auto& e : get_processed_edges(vid)) {
                 os << " " << e;
             }
             os << std::endl;
@@ -611,7 +604,7 @@ public:
         os << "forgotten" << std::endl;
         for (InternalVertexId vid = 0; vid < V; ++vid) {
             os << "     " << vid << "(v=" << get_vertex(vid) << "):";
-            for (const auto& u: get_forgotten(vid)) {
+            for (const auto& u : get_forgotten(vid)) {
                 os << " " << u;
             }
             os << std::endl;
@@ -630,7 +623,7 @@ public:
     std::vector<int> retrieve_vertices(const std::set<Level>& items) const {
         std::vector<int> used(V_, 0);
 
-        for (auto level: items) {
+        for (auto level : items) {
             Vertex v = get_vertex(V_ - level);
             used[v] = 1;
         }
@@ -638,16 +631,17 @@ public:
         return used;
     }
 
-private:
+   private:
     void construct_frontiers() {
         auto V = number_of_vertices();
 
         // calculate processed_
         processed_.resize(V);
         int count_processed_edges = 0;
-        for (InternalVertexId vid = 0; vid < static_cast<InternalVertexId>(V); ++vid) {
+        for (InternalVertexId vid = 0; vid < static_cast<InternalVertexId>(V);
+             ++vid) {
             Vertex v = get_vertex(vid);
-            for (Edge e: graph_[v]) {
+            for (Edge e : graph_[v]) {
                 if (map_to_internal_vertex_id(e.dst) <= vid) {
                     processed_[vid].emplace_back(e);
                     count_processed_edges++;
@@ -658,10 +652,11 @@ private:
 
         // calculate forgotten vertices
         forgotten_.resize(V);
-        for (InternalVertexId vid = 0; vid < static_cast<InternalVertexId>(V); ++vid) {
+        for (InternalVertexId vid = 0; vid < static_cast<InternalVertexId>(V);
+             ++vid) {
             Vertex v = get_vertex(vid);
             InternalVertexId forget_v = vid;
-            for (Edge e: graph_[v]) {
+            for (Edge e : graph_[v]) {
                 forget_v = std::max(map_to_internal_vertex_id(e.dst), forget_v);
             }
             forgotten_[forget_v].emplace_back(v);
@@ -670,18 +665,19 @@ private:
         // calculate frontiers
         frontiers_.resize(V);
         std::set<Vertex> bag;
-        for (InternalVertexId vid = 0; vid < static_cast<InternalVertexId>(V); ++vid) {
+        for (InternalVertexId vid = 0; vid < static_cast<InternalVertexId>(V);
+             ++vid) {
             // introduced vertex
             Vertex v = get_vertex(vid);
             bag.insert(v);
 
             // determine frontier
-            for (auto uu: bag) {
+            for (auto uu : bag) {
                 frontiers_[vid].emplace_back(uu);
             }
 
             // forgotten vertices
-            for (auto uu: get_forgotten(vid)) {
+            for (auto uu : get_forgotten(vid)) {
                 bag.erase(uu);
             }
         }
@@ -689,15 +685,17 @@ private:
 
         // frontier size
         max_frontier_size_ = 0;
-        for (const auto& f: frontiers_) {
-            max_frontier_size_ = std::max(static_cast<int>(f.size()), max_frontier_size_);
+        for (const auto& f : frontiers_) {
+            max_frontier_size_ =
+                std::max(static_cast<int>(f.size()), max_frontier_size_);
         }
 
         // map vertex to position
         // fill unused entry with V
         mapping_vertex_pos_.assign(V, V);
         std::vector<bool> used(max_frontier_size_, false);
-        for (InternalVertexId vid = 0; vid < static_cast<InternalVertexId>(V); ++vid) {
+        for (InternalVertexId vid = 0; vid < static_cast<InternalVertexId>(V);
+             ++vid) {
             // introduce vertex
             Vertex v = get_vertex(vid);
             bool success = false;
@@ -712,7 +710,7 @@ private:
             assert(success);
 
             // forget vertex
-            for (auto uu: get_forgotten(vid)) {
+            for (auto uu : get_forgotten(vid)) {
                 FrontierPosition released = mapping_vertex_pos_[uu];
                 used[released] = false;
             }
@@ -726,9 +724,7 @@ private:
     }
 };
 
+}  // namespace graph
+}  // namespace pyzdd
 
-
-} // namespace graph
-} // namespace pyzdd
-
-#endif // PYZDD_GRAPH_H
+#endif  // PYZDD_GRAPH_H
