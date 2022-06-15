@@ -79,6 +79,7 @@ setup(
     ],
     extras_require={
         "dev": [
+            "ipython",
             "pre-commit",
             "black",
             "versioneer",

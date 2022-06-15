@@ -17,7 +17,7 @@ include(FetchContent)
 FetchContent_Declare(
   pybind11
   GIT_REPOSITORY https://github.com/pybind/pybind11.git
-  GIT_TAG        ffa346860b306c9bbfb341aed9c14c067751feb8
+  GIT_TAG        v2.9.2
 )
 FetchContent_MakeAvailable(tdzdd)
 FetchContent_MakeAvailable(pybind11)
