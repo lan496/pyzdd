@@ -1,6 +1,7 @@
-from pathlib import Path
+import os
 from os.path import splitext, basename
-import setuptools
+from pathlib import Path
+import subprocess
 from setuptools import setup, Extension, find_packages
 from setuptools.command.build_ext import build_ext
 import sys
@@ -11,88 +12,51 @@ with open(Path(__file__).resolve().parent / "README.md") as f:
     long_description = "\n" + f.read()
 
 
-ext_modules = [
-    Extension(
-        "_pyzdd",
-        # Sort input source files to ensure bit-for-bit reproducible builds
-        # (https://github.com/pybind/python_example/pull/53)
-        sorted(glob("src/*.cpp")),
-        include_dirs=[
-            "extern/pybind11/include",
-            "extern/TdZdd/include",
-        ],
-        language="c++",
-    ),
-]
+# Adapted from https://github.com/pybind/cmake_example
+
+# A CMakeExtension needs a sourcedir instead of a file list.
+# The name must be the _single_ output extension from the CMake build.
+# If you need multiple extensions, see scikit-build.
+class CMakeExtension(Extension):
+    def __init__(self, name, sourcedir=""):
+        Extension.__init__(self, name, sources=[])
+        self.sourcedir = os.path.abspath(sourcedir)
 
 
-# cf http://bugs.python.org/issue26689
-def has_flag(compiler, flagname):
-    """Return a boolean indicating whether a flag name is supported on
-    the specified compiler.
-    """
-    import tempfile
-    import os
+class CMakeBuild(build_ext):
+    def build_extension(self, ext):
+        extdir = os.path.abspath(os.path.dirname(self.get_ext_fullpath(ext.name)))
 
-    with tempfile.NamedTemporaryFile("w", suffix=".cpp", delete=False) as f:
-        f.write("int main (int argc, char **argv) { return 0; }")
-        fname = f.name
-    try:
-        compiler.compile([fname], extra_postargs=[flagname])
-    except setuptools.distutils.errors.CompileError:
-        return False
-    finally:
-        try:
-            os.remove(fname)
-        except OSError:
-            pass
-    return True
+        # required for auto-detection of auxiliary "native" libs
+        if not extdir.endswith(os.path.sep):
+            extdir += os.path.sep
 
+        cfg = "Debug" if self.debug else "Release"
 
-def cpp_flag(compiler):
-    """Return the -std=c++[11/14/17] compiler flag.
-    The newer version is prefered over c++11 (when it is available).
-    """
-    flags = ["-std=c++17", "-std=c++14", "-std=c++11"]
+        # Set Python_EXECUTABLE instead if you use PYBIND11_FINDPYTHON
+        # EXAMPLE_VERSION_INFO shows you how to pass a value into the C++ code
+        # from Python.
+        cmake_args = [
+            "-DCMAKE_LIBRARY_OUTPUT_DIRECTORY={}".format(extdir),
+            "-DPYTHON_EXECUTABLE={}".format(sys.executable),
+            "-DCMAKE_BUILD_TYPE={}".format(cfg),  # not used on MSVC, but no harm
+        ]
+        build_args = []
 
-    for flag in flags:
-        if has_flag(compiler, flag):
-            return flag
+        # Set CMAKE_BUILD_PARALLEL_LEVEL to control the parallel build level
+        # across all generators.
+        if "CMAKE_BUILD_PARALLEL_LEVEL" not in os.environ:
+            # self.parallel is a Python 3 only way to set parallel jobs by hand
+            # using -j in the build_ext call, not supported by pip or PyPA-build.
+            if hasattr(self, "parallel") and self.parallel:
+                # CMake 3.12+ only.
+                build_args += ["-j{}".format(self.parallel)]
 
-    raise RuntimeError("Unsupported compiler -- at least C++11 support " "is needed!")
+        if not os.path.exists(self.build_temp):
+            os.makedirs(self.build_temp)
 
-
-class BuildExt(build_ext):
-    """A custom build extension for adding compiler-specific options."""
-
-    c_opts = {
-        "msvc": ["/EHsc"],
-        "unix": [],
-    }
-    l_opts = {
-        "msvc": [],
-        "unix": [],
-    }  # type: ignore
-
-    if sys.platform == "darwin":
-        darwin_opts = ["-stdlib=libc++", "-mmacosx-version-min=10.7"]
-        c_opts["unix"] += darwin_opts
-        l_opts["unix"] += darwin_opts
-
-    def build_extensions(self):
-        ct = self.compiler.compiler_type
-        opts = self.c_opts.get(ct, [])
-        link_opts = self.l_opts.get(ct, [])
-        if ct == "unix":
-            opts.append(cpp_flag(self.compiler))
-            if has_flag(self.compiler, "-fvisibility=hidden"):
-                opts.append("-fvisibility=hidden")
-
-        for ext in self.extensions:
-            ext.define_macros = [("VERSION_INFO", '"{}"'.format(self.distribution.get_version()))]
-            ext.extra_compile_args = opts
-            ext.extra_link_args = link_opts
-        build_ext.build_extensions(self)
+        subprocess.check_call(["cmake", ext.sourcedir] + cmake_args, cwd=self.build_temp)
+        subprocess.check_call(["cmake", "--build", "."] + build_args, cwd=self.build_temp)
 
 
 setup(
@@ -127,10 +91,10 @@ setup(
         ],
     },
     test_requires=["pytest"],
-    ext_modules=ext_modules,
+    ext_modules=[CMakeExtension("pyzdd_", sourcedir="./")],
+    cmdclass={"build_ext": CMakeBuild},
     setup_requires=["setuptools_scm"],
     use_scm_version=True,
-    cmdclass={"build_ext": BuildExt},
     zip_safe=False,
     classifiers=[
         # Trove classifiers

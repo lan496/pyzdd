@@ -12,14 +12,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v3
-      with:
-        submodules: true
     - name: Install dependencies
       run: |
         sudo apt-get install -y make gcc g++
     - name: Test
       run: |
-        cd src
+        cd src/test
         cmake -S . -B build
         cmake --build build
         cd build

@@ -1,6 +1,6 @@
 from typing import Generator, List
 
-from _pyzdd import (
+from pyzdd_ import (
     BinaryVertexConverter,
     construct_derivative_structures,
     construct_derivative_structures_with_sro,

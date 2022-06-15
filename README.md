@@ -8,7 +8,7 @@ Python wrapper to TdZdd
 ## Installation
 
 ```shell
-git clone --recursive git@github.com:lan496/pyzdd.git
+git clone git@github.com:lan496/pyzdd.git
 cd pyzdd
 pip install -e .
 ```
@@ -53,7 +53,7 @@ pre-commit install
 ### Testing
 
 ```shell
-cd src
+cd src/test
 cmake -S . -B build
 cmake --build build -j 32
 cd build && ctest -vv

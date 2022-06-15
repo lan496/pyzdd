@@ -1,7 +1,7 @@
 from typing import Any, Dict, List, Tuple
 
 import networkx as nx
-from _pyzdd import (
+from pyzdd_ import (
     Edge,
     Graph,
     GraphAuxiliary,

@@ -16,7 +16,7 @@
 
 namespace py = pybind11;
 
-PYBIND11_MODULE(_pyzdd, m) {
+PYBIND11_MODULE(pyzdd_, m) {
     m.doc() = "wrapper to TdZdd";
 
     // DD structure

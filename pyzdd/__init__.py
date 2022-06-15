@@ -1,6 +1,6 @@
 from typing import Generator, List, Set
 
-from _pyzdd import (
+from pyzdd_ import (
     Choice,
     Combination,
     Permutation,
