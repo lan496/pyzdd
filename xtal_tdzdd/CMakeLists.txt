@@ -4,7 +4,6 @@ project(xtal_tdzdd CXX)
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
-set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 
 # Fetch TdZdd
 include(FetchContent)
@@ -23,7 +22,8 @@ endif()
 
 add_compile_options(-O3 -Wall -Winit-self -Wlogical-op)
 
-add_library(xtal_tdzdd SHARED
+add_library(xtal_tdzdd STATIC
             iterator.cpp)
+set_target_properties(xtal_tdzdd PROPERTIES POSITION_INDEPENDENT_CODE ON)
 target_include_directories(xtal_tdzdd PRIVATE ./)
 target_include_directories(xtal_tdzdd PRIVATE ${tdzdd_SOURCE_DIR}/include)

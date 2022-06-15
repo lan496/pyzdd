@@ -31,4 +31,4 @@ message(STATUS ${pybind11_SOURCE_DIR})
 
 add_subdirectory(${pybind11_SOURCE_DIR})
 pybind11_add_module(pyzdd_ ./xtal_tdzdd/wrapper.cpp)
-target_link_libraries(pyzdd_ PUBLIC xtal_tdzdd)
+target_link_libraries(pyzdd_ PRIVATE xtal_tdzdd)
