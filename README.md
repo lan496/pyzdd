@@ -67,7 +67,7 @@ pre-commit install
 ### Testing
 
 ```shell
-cd src/test
+cd xtal_tdzdd/test
 cmake -S . -B build
 cmake --build build -j 32
 cd build && ctest -vv

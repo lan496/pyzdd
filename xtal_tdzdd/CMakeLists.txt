@@ -20,10 +20,11 @@ if (OPENMP_FOUND)
   set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS}")
 endif()
 
-add_compile_options(-O3 -Wall -Winit-self -Wlogical-op)
 
 add_library(xtal_tdzdd STATIC
             iterator.cpp)
+target_compile_options(xtal_tdzdd PRIVATE
+                       -O3 -Wall -Winit-self -Wlogical-op)
 set_target_properties(xtal_tdzdd PROPERTIES POSITION_INDEPENDENT_CODE ON)
 target_include_directories(xtal_tdzdd PRIVATE ./)
 target_include_directories(xtal_tdzdd PRIVATE ${tdzdd_SOURCE_DIR}/include)

@@ -33,7 +33,8 @@ if (OPENMP_FOUND)
   set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS}")
 endif()
 
-add_compile_options(-O3 -Wall -Winit-self -Wlogical-op)
+add_compile_options(-O3 -Wall -Winit-self -Wlogical-op -fsanitize=address)
+add_link_options(-fsanitize=address)
 
 enable_testing()
 include(GoogleTest)
