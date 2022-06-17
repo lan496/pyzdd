@@ -1,5 +1,5 @@
 # pyzdd
-[![testing](https://github.com/lan496/pyzdd/actions/workflows/ci.yml/badge.svg)](https://github.com/lan496/pyzdd/actions/workflows/ci.yml)
+[![testing](https://github.com/lan496/pyzdd/actions/workflows/testing.yml/badge.svg)](https://github.com/lan496/pyzdd/actions/workflows/testing.yml)
 [![pre-commit.ci status](https://results.pre-commit.ci/badge/github/lan496/pyzdd/main.svg?badge_token=MU26PgVHQe-LRTPsqN6olg)](https://results.pre-commit.ci/latest/github/lan496/pyzdd/main?badge_token=MU26PgVHQe-LRTPsqN6olg)
 [![MIT License](http://img.shields.io/badge/license-MIT-blue.svg?style=flat)](LICENSE)
 ![PyPI - Python Version](https://img.shields.io/pypi/pyversions/pyzdd)
