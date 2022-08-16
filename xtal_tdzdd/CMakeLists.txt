@@ -14,15 +14,15 @@ FetchContent_Declare(
 )
 FetchContent_MakeAvailable(tdzdd)
 
-# OpenMP
-find_package(OpenMP)
-if (OPENMP_FOUND)
-  set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS}")
-endif()
-
-
 add_library(xtal_tdzdd STATIC
             iterator.cpp)
+
+# OpenMP: https://cliutils.gitlab.io/modern-cmake/chapters/packages/OpenMP.html
+find_package(OpenMP REQUIRED)
+if(OpenMP_CXX_FOUND)
+    target_link_libraries(xtal_tdzdd PUBLIC OpenMP::OpenMP_CXX)
+endif()
+
 target_compile_options(xtal_tdzdd PRIVATE
                        -O3 -Wall -Winit-self -Wlogical-op)
 set_target_properties(xtal_tdzdd PROPERTIES POSITION_INDEPENDENT_CODE ON)
