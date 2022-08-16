@@ -16,7 +16,7 @@ include(FetchContent)
 FetchContent_Declare(
   pybind11
   GIT_REPOSITORY https://github.com/pybind/pybind11.git
-  GIT_TAG        v2.9.2
+  GIT_TAG        v2.10.0
 )
 FetchContent_MakeAvailable(tdzdd)
 FetchContent_MakeAvailable(pybind11)
@@ -28,7 +28,8 @@ include_directories(${tdzdd_SOURCE_DIR}/include)
 add_subdirectory(./xtal_tdzdd)
 
 message(STATUS ${pybind11_SOURCE_DIR})
+message(STATUS ${pybind11_BINARY_DIR})
 
-add_subdirectory(${pybind11_SOURCE_DIR})
+add_subdirectory("${pybind11_SOURCE_DIR}" pybind11)
 pybind11_add_module(pyzdd_ ./xtal_tdzdd/wrapper.cpp)
 target_link_libraries(pyzdd_ PRIVATE xtal_tdzdd)
