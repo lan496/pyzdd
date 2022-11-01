@@ -24,7 +24,7 @@ jobs:
           sudo apt-get install -y make cmake gcc g++
 
       - name: Build wheels
-        uses: pypa/cibuildwheel@v2.10.2
+        uses: pypa/cibuildwheel@v2.11.2
         env:
           CIBW_BUILD: "cp3*-manylinux_x86_64"
 
