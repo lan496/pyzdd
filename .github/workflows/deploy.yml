@@ -5,35 +5,41 @@ on:
     branches: [main]
     tags:
       - "v[0-9]+.[0-9]+.[0-9]+"
-  workflow_run:
-    workflows: [testing]
-    types: [completed]
+  workflow_dispatch:
 
 jobs:
+  # https://cibuildwheel.readthedocs.io/en/stable/setup/#github-actions
   build_wheels:
-    if: ${{ github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.event == 'push' && startsWith(github.event.workflow_run.head_branch, 'v') }}
-    runs-on: ubuntu-latest
+    name: Build wheels on ${{ matrix.os }}
+    if: ${{ github.event_name == 'push' && startsWith(github.event.ref, 'refs/tags') }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os:
+          - ubuntu-20.04
+          # - macos-11
 
     steps:
       - uses: actions/checkout@v3
         with:
           fetch-depth: 0
 
-      - name: Install dependencies
-        run: |
-          sudo apt-get install -y make cmake gcc g++
-
       - name: Build wheels
-        uses: pypa/cibuildwheel@v2.11.2
+        uses: pypa/cibuildwheel@v2.11.3
         env:
-          CIBW_BUILD: "cp3*-manylinux_x86_64"
+          CIBW_ARCHS_LINUX: "x86_64"
+          CIBW_MANYLINUX_X86_64_IMAGE: manylinux2014
+          CIBW_BEFORE_BUILD_LINUX: yum install -y make cmake gcc gcc-c++
+          # CIBW_ARCHS_MACOS: "x86_64 arm64"
+          # CIBW_BEFORE_ALL_MACOS: brew install cmake libomp
+          CIBW_SKIP: pp* *-musllinux_*
 
       - uses: actions/upload-artifact@v3
         with:
           path: ./wheelhouse/*.whl
 
   build_sdist:
-    if: ${{ github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.event == 'push' && startsWith(github.event.workflow_run.head_branch, 'v') }}
+    if: ${{ github.event_name == 'push' && startsWith(github.event.ref, 'refs/tags') }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
