@@ -19,7 +19,7 @@ jobs:
         # https://cibuildwheel.readthedocs.io/en/stable/options/#build-skip
         buildplat:
           - [ubuntu-20.04, manylinux_x86_64]
-          - [macos-12, macosx_x86_64]
+          - [macos-12, macosx_*]
           # No Github-Actions hosted runner for M1 mac for now...
           # https://github.com/actions/runner-images/issues/2187
           # - [macos-12, macosx_arm64]
