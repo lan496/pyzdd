@@ -13,7 +13,7 @@ manylinux-x86_64-image = "manylinux2014"
 before-build = "yum install -y make cmake gcc gcc-c++"
 
 [tool.cibuildwheel.macos]
-archs = ["x86_64", "arm64"]
+# archs = ["x86_64", "arm64"]
 
 [tool.black]
 line-length = 99
