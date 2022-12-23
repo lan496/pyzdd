@@ -73,6 +73,16 @@ cmake --build build -j 32
 cd build && ctest -vv
 ```
 
+### Building Python wheels in local
+
+```shell
+# Linux build
+cibuildwheel --platform linux
+
+# MacOS build
+cibuildwheel --platform macos
+```
+
 ### Write Custom Specification
 1. Write a TdZdd-specification in `src/spec/*.hpp`
 2. Let the new specification class be `A`, wrap the following classes and methods in `src/wrapper.cpp`

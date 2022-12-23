@@ -5,6 +5,16 @@ build-backend = "setuptools.build_meta"
 # Enable version inference
 [tool.setuptools_scm]
 
+[tool.cibuildwheel]
+manylinux-x86_64-image = "manylinux2014"
+
+[tool.cibuildwheel.linux]
+# Note that manylinux_2_24 builds occur inside a Debian9 docker, where manylinux2010 and manylinux2014 builds occur inside a CentOS one. So for manylinux_2_24 the CIBW_BEFORE_ALL_LINUX command must use apt-get -y instead.
+before-build = "yum install -y make cmake gcc gcc-c++"
+
+[tool.cibuildwheel.macos]
+archs = ["x86_64", "arm64"]
+
 [tool.black]
 line-length = 99
 target-version = ['py38', 'py39', 'py310']

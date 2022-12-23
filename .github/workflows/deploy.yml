@@ -10,29 +10,45 @@ on:
 jobs:
   # https://cibuildwheel.readthedocs.io/en/stable/setup/#github-actions
   build_wheels:
-    name: Build wheels on ${{ matrix.os }}
+    name: Build wheel for ${{ matrix.python }}-${{ matrix.buildplat[1] }}
     if: ${{ github.event_name == 'push' && startsWith(github.event.ref, 'refs/tags') }}
-    runs-on: ${{ matrix.os }}
+    runs-on: ${{ matrix.buildplat[0] }}
     strategy:
+      fail-fast: false
       matrix:
-        os:
-          - ubuntu-20.04
-          # - macos-11
+        # https://cibuildwheel.readthedocs.io/en/stable/options/#build-skip
+        buildplat:
+          - [ubuntu-20.04, manylinux_x86_64]
+          - [macos-12, macosx_x86_64]
+          # No Github-Actions hosted runner for M1 mac for now...
+          # https://github.com/actions/runner-images/issues/2187
+          # - [macos-12, macosx_arm64]
+        python: ["cp38", "cp39", "cp310", "cp311"]
 
     steps:
       - uses: actions/checkout@v3
         with:
           fetch-depth: 0
 
+      - name: Install MacOS dependencies
+        if: ${{ startsWith(matrix.buildplat[0], 'macos') }}
+        # https://github.com/bluesheeptoken/CPT/blob/master/CI/github/build_wheels.sh
+        # https://github.com/scikit-learn/scikit-learn/blob/main/build_tools/github/build_wheels.sh
+        run: |
+          PREFIX=$(brew --prefix)
+          brew install libomp
+          echo CC=/usr/bin/clang >> $GITHUB_ENV
+          echo CXX=/usr/bin/clang++ >> $GITHUB_ENV
+          echo CFLAGS="${CFLAGS} -I${PREFIX}/opt/libomp/include" >> $GITHUB_ENV
+          echo CXXFLAGS="${CXXFLAGS} -I${PREFIX}/opt/libomp/include" >> $GITHUB_ENV
+          echo LDFLAGS="${LDFLAGS} -Wl,-rpath,${PREFIX}/opt/libomp/lib -L${PREFIX}/opt/libomp/lib -lomp" >> $GITHUB_ENV
+
       - name: Build wheels
         uses: pypa/cibuildwheel@v2.11.3
         env:
-          CIBW_ARCHS_LINUX: "x86_64"
-          CIBW_MANYLINUX_X86_64_IMAGE: manylinux2014
-          CIBW_BEFORE_BUILD_LINUX: yum install -y make cmake gcc gcc-c++
-          # CIBW_ARCHS_MACOS: "x86_64 arm64"
-          # CIBW_BEFORE_ALL_MACOS: brew install cmake libomp
-          CIBW_SKIP: pp* *-musllinux_*
+          CIBW_BUILD: ${{ matrix.python }}-${{ matrix.buildplat[1] }}
+        with:
+          config-file: "{package}/pyproject.toml"
 
       - uses: actions/upload-artifact@v3
         with:

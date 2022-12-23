@@ -17,11 +17,18 @@ FetchContent_MakeAvailable(tdzdd)
 add_library(xtal_tdzdd STATIC
             iterator.cpp)
 
-# OpenMP: https://cliutils.gitlab.io/modern-cmake/chapters/packages/OpenMP.html
+# https://cliutils.gitlab.io/modern-cmake/chapters/packages/OpenMP.html
+# https://iscinumpy.gitlab.io/post/omp-on-high-sierra/
 find_package(OpenMP REQUIRED)
-if(OpenMP_CXX_FOUND)
-    target_link_libraries(xtal_tdzdd PUBLIC OpenMP::OpenMP_CXX)
+if(NOT TARGET OpenMP::OpenMP_CXX)
+    add_library(OpenMP_TARGET INTERFACE)
+    add_library(OpenMP::OpenMP_CXX ALIAS OpenMP_TARGET)
+    target_compile_options(OpenMP_TARGET INTERFACE ${OpenMP_CXX_FLAGS})
+    find_package(Threads REQUIRED)
+    target_link_libraries(OpenMP_TARGET INTERFACE Threads::Threads)
+    target_link_libraries(OpenMP_TARGET INTERFACE ${OpenMP_CXX_FLAGS})
 endif()
+target_link_libraries(xtal_tdzdd PUBLIC OpenMP::OpenMP_CXX)
 
 target_compile_options(xtal_tdzdd PRIVATE
                        -O3 -Wall -Winit-self -Wlogical-op)
