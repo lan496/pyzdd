@@ -12,6 +12,7 @@ with open(Path(__file__).resolve().parent / "README.md") as f:
 
 # Adapted from https://github.com/pybind/cmake_example
 
+
 # A CMakeExtension needs a sourcedir instead of a file list.
 # The name must be the _single_ output extension from the CMake build.
 # If you need multiple extensions, see scikit-build.

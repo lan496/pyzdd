@@ -81,7 +81,7 @@ def test_sro():
         automorphism,
         composition_constraints,
     )
-    for (graph, target) in zip(graphs, targets):
+    for graph, target in zip(graphs, targets):
         restrict_pair_correlation(
             dd2,
             num_sites,
