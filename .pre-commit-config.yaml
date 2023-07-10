@@ -41,7 +41,7 @@ repos:
         types: [pyi]
   # Upgrade syntax
   - repo: https://github.com/asottile/pyupgrade
-    rev: v3.8.0
+    rev: v3.9.0
     hooks:
       - id: pyupgrade
   - repo: https://github.com/pocc/pre-commit-hooks
