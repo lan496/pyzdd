@@ -44,7 +44,7 @@ jobs:
           echo LDFLAGS="${LDFLAGS} -Wl,-rpath,${PREFIX}/opt/libomp/lib -L${PREFIX}/opt/libomp/lib -lomp" >> $GITHUB_ENV
 
       - name: Build wheels
-        uses: pypa/cibuildwheel@v2.13.1
+        uses: pypa/cibuildwheel@v2.14.1
         env:
           CIBW_BUILD: ${{ matrix.python }}-${{ matrix.buildplat[1] }}
         with:
