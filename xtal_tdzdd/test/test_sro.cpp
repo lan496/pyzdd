@@ -80,8 +80,7 @@ TEST(SroTest, BinaryTest) {
         construct_derivative_structures_with_sro(
             dd, num_sites, num_types, vertex_order, automorphism, translations,
             composition_constraints, graphs, targets,
-            true,  // remove superperiodic
-            false  // not useMP
+            true  // remove superperiodic
         );
 
         std::string cardinality_expect = "1";
@@ -184,8 +183,8 @@ TEST(SroTest, TernaryTest) {
     construct_derivative_structures_with_sro(
         dd, num_sites, num_types, vertex_order, automorphism, translations,
         composition_constraints, cluster_graphs, targets,
-        true,  // remove superperiodic
-        false);
+        true  // remove superperiodic
+    );
 
     // return labelings
     auto converter = VertexConverter(num_variables, vertex_order);
