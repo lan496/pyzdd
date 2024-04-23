@@ -6,6 +6,12 @@ on:
     paths:
     - '**.cpp'
     - '**.hpp'
+  pull_request:
+    branches: [main, develop]
+    paths:
+    - '**.cpp'
+    - '**.hpp'
+  workflow_dispatch:
 
 jobs:
   test-tdzdd:
