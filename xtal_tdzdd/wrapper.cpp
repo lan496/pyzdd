@@ -22,8 +22,8 @@ PYBIND11_MODULE(pyzdd_, m) {
     // DD structure
     py::class_<tdzdd::DdStructure<2>> PyDdStructure2(m, "Universe");
     PyDdStructure2.def(py::init<>());
-    PyDdStructure2.def(py::init<int, bool>(), "Universe DD construction",
-                       py::arg("n"), py::arg("useMP") = false);
+    PyDdStructure2.def(py::init<int>(), "Universe DD construction",
+                       py::arg("n"));
     PyDdStructure2.def(
         py::init<tdzdd::DdStructure<2> const &>());  // copy constructor
     PyDdStructure2.def(py::self == py::self);        // operator==
@@ -115,7 +115,7 @@ PYBIND11_MODULE(pyzdd_, m) {
           &pyzdd::derivative_structure::prepare_derivative_structures_with_sro,
           py::arg("dd"), py::arg("num_sites"), py::arg("num_types"),
           py::arg("vertex_order"), py::arg("automorphism"),
-          py::arg("composition_constraints"), py::arg("useMP") = false);
+          py::arg("composition_constraints"));
     m.def("restrict_pair_correlation",
           &pyzdd::derivative_structure::restrict_pair_correlation,
           py::arg("dd"), py::arg("num_sites"), py::arg("num_types"),
@@ -130,8 +130,7 @@ PYBIND11_MODULE(pyzdd_, m) {
         py::arg("dd"), py::arg("num_sites"), py::arg("num_types"),
         py::arg("vertex_order"), py::arg("automorphism"),
         py::arg("translations"), py::arg("composition_constraints"),
-        py::arg("graphs"), py::arg("targets"), py::arg("remove_superperiodic"),
-        py::arg("useMP") = false);
+        py::arg("graphs"), py::arg("targets"), py::arg("remove_superperiodic"));
     // converter
     py::class_<pyzdd::derivative_structure::VertexConverter>(
         m, "BinaryVertexConverter")

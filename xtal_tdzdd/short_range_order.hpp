@@ -109,8 +109,7 @@ void prepare_binary_derivative_structures_with_sro_(
     const std::vector<graph::Vertex>& vertex_order,
     const std::vector<permutation::Permutation>& automorphism,
     const std::vector<std::pair<std::vector<int>, int>>&
-        composition_constraints,
-    bool useMP) {
+        composition_constraints) {
     // sanity check
     for (const auto& perm : automorphism) {
         if (perm.get_size() != static_cast<size_t>(num_sites)) {
@@ -144,7 +143,7 @@ void prepare_binary_derivative_structures_with_sro_(
 
     // ======== construct DD ========
     dd = universe::Universe(num_variables);
-    dd.useMultiProcessors(useMP);
+    dd.useMultiProcessors(false);
 
     // spec for composition constraints
     assert(!composition_constraints.empty());
@@ -179,8 +178,7 @@ void prepare_multicomponent_derivative_structures_with_sro_(
     const std::vector<graph::Vertex>& vertex_order,
     const std::vector<permutation::Permutation>& automorphism,
     const std::vector<std::pair<std::vector<int>, int>>&
-        composition_constraints,
-    bool useMP) {
+        composition_constraints) {
     size_t num_variables = num_sites * num_types;
     // sanity check
     for (const auto& perm : automorphism) {
@@ -215,7 +213,7 @@ void prepare_multicomponent_derivative_structures_with_sro_(
 
     // ======== construct DD ========
     dd = universe::Universe(num_variables);
-    dd.useMultiProcessors(useMP);
+    dd.useMultiProcessors(false);
 
     // spec for one-of-k
     for (permutation::Element site = 0;
@@ -271,8 +269,7 @@ void prepare_derivative_structures_with_sro(
     const std::vector<graph::Vertex>& vertex_order,
     const std::vector<permutation::Permutation>& automorphism,
     const std::vector<std::pair<std::vector<int>, int>>&
-        composition_constraints,
-    bool useMP) {
+        composition_constraints) {
     // sanity check
     assert(num_sites >= 1);
     assert(num_types >= 2);
@@ -283,11 +280,11 @@ void prepare_derivative_structures_with_sro(
     if (num_types == 2) {
         prepare_binary_derivative_structures_with_sro_(
             dd, num_sites, num_types, vertex_order, automorphism,
-            composition_constraints, useMP);
+            composition_constraints);
     } else {
         prepare_multicomponent_derivative_structures_with_sro_(
             dd, num_sites, num_types, vertex_order, automorphism,
-            composition_constraints, useMP);
+            composition_constraints);
     }
     tdzdd::MessageHandler::showMessages(false);
 }
@@ -336,12 +333,11 @@ void construct_derivative_structures_with_sro(
     const std::vector<std::pair<std::vector<int>, int>>&
         composition_constraints,
     const std::vector<graph::Graph>& graphs,
-    const std::vector<graph::Weight>& targets, bool remove_superperiodic,
-    bool useMP) {
+    const std::vector<graph::Weight>& targets, bool remove_superperiodic) {
     // ==== construct DD ====
     prepare_derivative_structures_with_sro(dd, num_sites, num_types,
                                            vertex_order, automorphism,
-                                           composition_constraints, useMP);
+                                           composition_constraints);
 
     // fix SRO
     // TODO: better vertex_order choice
