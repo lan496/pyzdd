@@ -13,7 +13,7 @@ Python wrapper to TdZdd
 
 ## Installation
 
-pyzdd works with Python3.8+ and can be installed via PyPI:
+pyzdd works with Python3.9+ and can be installed via PyPI:
 
 ```shell
 pip install pyzdd

@@ -23,7 +23,7 @@ jobs:
           # No Github-Actions hosted runner for M1 mac for now...
           # https://github.com/actions/runner-images/issues/2187
           # - [macos-12, macosx_arm64]
-        python: ["cp38", "cp39", "cp310", "cp311"]
+        python: ["cp39", "cp310", "cp311", "cp312"]
 
     steps:
       - uses: actions/checkout@v4
