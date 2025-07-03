@@ -3,6 +3,7 @@
 
 #include <algorithm>
 #include <cassert>
+#include <climits>
 #include <iostream>
 #include <limits>
 #include <queue>
