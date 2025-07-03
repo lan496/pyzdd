@@ -30,4 +30,4 @@ jobs:
         cmake -S . -B build
         cmake --build build
         cd build
-        ctest -v
+        ctest
