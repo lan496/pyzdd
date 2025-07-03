@@ -15,25 +15,32 @@ before-build = "yum install -y make cmake gcc gcc-c++"
 [tool.cibuildwheel.macos]
 # archs = ["x86_64", "arm64"]
 
-[tool.black]
+[tool.ruff]
 line-length = 99
-target-version = ['py39', 'py310']
-include = '\.pyi?$'
-exclude = '''
-/(
-    \.eggs
-  | \.git
-  | \.hg
-  | \.mypy_cache
-  | \.tox
-  | \.venv
-  | _build
-  | buck-out
-  | build
-  | dist
-  | docs
-)/
-'''
+[tool.ruff.lint]
+extend-select = [
+    "F",           # pyflakes
+    "E",           # pycodestyle-errors
+    "I",           # isort
+    # "D",           # pydocstyle
+    "UP",          # pyupgrade
+]
+extend-ignore = [
+    "D100",
+    "D101",
+    "D102",
+    "D103",
+    "D203",  # Conflict with D211
+    "D205",
+    "D213",  # Conflict with D212
+    "E501",
+]
 
+[tool.mypy]
+exclude = [
+  'docs',
+]
+
+warn_no_return = false
 [tool.pytest.ini_options]
 testpaths = ["tests"]

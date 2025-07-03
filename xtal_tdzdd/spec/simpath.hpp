@@ -5,6 +5,7 @@
 #include <climits>
 #include <memory>
 #include <tdzdd/DdSpec.hpp>
+
 #include "../graph.hpp"
 #include "../type.hpp"
 

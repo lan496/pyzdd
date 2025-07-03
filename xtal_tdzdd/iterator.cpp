@@ -1,5 +1,7 @@
 #include "iterator.hpp"
+
 #include <set>
+
 #include "type.hpp"
 
 namespace pyzdd {

@@ -1,9 +1,9 @@
 #ifndef PYZDD_INDUCED_SUBGRAPH_H
 #define PYZDD_INDUCED_SUBGRAPH_H
 
+#include <tdzdd/DdSpec.hpp>
 #include <type_traits>
 
-#include <tdzdd/DdSpec.hpp>
 #include "../graph.hpp"
 #include "../type.hpp"
 

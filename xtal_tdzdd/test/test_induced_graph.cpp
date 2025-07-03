@@ -1,10 +1,10 @@
+#include <gtest/gtest.h>
+
 #include <iostream>
 #include <string>
-#include <unordered_set>
-
-#include <gtest/gtest.h>
 #include <tdzdd/DdSpec.hpp>
 #include <tdzdd/DdStructure.hpp>
+#include <unordered_set>
 
 #include "graph.hpp"
 #include "spec/induced_subgraph.hpp"

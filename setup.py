@@ -1,10 +1,10 @@
 import os
-from pathlib import Path
 import subprocess
-from setuptools import setup, Extension, find_packages
-from setuptools.command.build_ext import build_ext
 import sys
+from pathlib import Path
 
+from setuptools import Extension, find_packages, setup
+from setuptools.command.build_ext import build_ext
 
 with open(Path(__file__).resolve().parent / "README.md") as f:
     long_description = "\n" + f.read()
@@ -49,7 +49,7 @@ class CMakeBuild(build_ext):
             # using -j in the build_ext call, not supported by pip or PyPA-build.
             if hasattr(self, "parallel") and self.parallel:
                 # CMake 3.12+ only.
-                build_args += ["-j{}".format(self.parallel)]
+                build_args += [f"-j{self.parallel}"]
 
         if not os.path.exists(self.build_temp):
             os.makedirs(self.build_temp)
@@ -78,6 +78,7 @@ setup(
     ],
     extras_require={
         "dev": [
+            "pre-commit",
             "versioneer",
             "pytest",
             "pytest-cov",

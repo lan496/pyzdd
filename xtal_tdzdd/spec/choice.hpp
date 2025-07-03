@@ -3,10 +3,10 @@
 
 #include <algorithm>
 #include <limits>
-#include <vector>
-
 #include <tdzdd/DdSpec.hpp>
 #include <tdzdd/DdStructure.hpp>
+#include <vector>
+
 #include "../type.hpp"
 
 namespace pyzdd {

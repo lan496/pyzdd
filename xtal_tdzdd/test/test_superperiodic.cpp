@@ -1,15 +1,14 @@
-#include <cassert>
-#include <iostream>
-#include <unordered_set>
-
 #include <gtest/gtest.h>
-#include <tdzdd/DdSpec.hpp>
-#include <tdzdd/DdStructure.hpp>
 
+#include <cassert>
 #include <graph.hpp>
+#include <iostream>
 #include <permutation.hpp>
 #include <spec/superperiodic.hpp>
+#include <tdzdd/DdSpec.hpp>
+#include <tdzdd/DdStructure.hpp>
 #include <type.hpp>
+#include <unordered_set>
 
 using namespace pyzdd;
 using namespace pyzdd::permutation;

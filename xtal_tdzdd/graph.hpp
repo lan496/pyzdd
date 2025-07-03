@@ -8,6 +8,7 @@
 #include <queue>
 #include <set>
 #include <vector>
+
 #include "type.hpp"
 
 namespace pyzdd {

@@ -1,12 +1,12 @@
+#include <gtest/gtest.h>
+
 #include <cassert>
 #include <iostream>
 #include <string>
-#include <unordered_set>
-#include <vector>
-
-#include <gtest/gtest.h>
 #include <tdzdd/DdSpec.hpp>
 #include <tdzdd/DdStructure.hpp>
+#include <unordered_set>
+#include <vector>
 
 #include "graph.hpp"
 #include "permutation.hpp"

@@ -1,7 +1,4 @@
-from typing import List, Set
-
 import networkx as nx
-from networkx import complete_graph, path_graph
 from networkx.generators.lattice import grid_graph
 
 from pyzdd.graph import (

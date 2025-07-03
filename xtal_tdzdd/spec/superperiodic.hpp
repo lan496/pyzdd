@@ -5,6 +5,7 @@
 #include <climits>
 #include <tdzdd/DdSpec.hpp>
 #include <type_traits>
+
 #include "../permutation.hpp"
 #include "../type.hpp"
 
