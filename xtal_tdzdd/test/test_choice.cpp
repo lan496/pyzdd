@@ -1,13 +1,12 @@
+#include <gtest/gtest.h>
+
 #include <cassert>
 #include <iostream>
-#include <unordered_set>
-
-#include <gtest/gtest.h>
+#include <spec/choice.hpp>
 #include <tdzdd/DdSpec.hpp>
 #include <tdzdd/DdStructure.hpp>
-
-#include <spec/choice.hpp>
 #include <type.hpp>
+#include <unordered_set>
 
 using namespace pyzdd;
 using namespace pyzdd::choice;

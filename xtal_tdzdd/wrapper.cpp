@@ -1,11 +1,11 @@
-#include <string>
-#include <vector>
-
 #include <pybind11/operators.h>
 #include <pybind11/pybind11.h>
 #include <pybind11/stl.h>
+
+#include <string>
 #include <tdzdd/DdSpec.hpp>
 #include <tdzdd/DdStructure.hpp>
+#include <vector>
 
 #include "graph.hpp"
 #include "iterator.hpp"

@@ -1,4 +1,6 @@
-from typing import Generator, List, Set
+from __future__ import annotations
+
+from collections.abc import Generator
 
 from pyzdd_ import (
     Choice,
@@ -10,10 +12,20 @@ from pyzdd_ import (
 )
 
 from pyzdd._version import __version__
-from pyzdd.graph import Graph
+
+__all__ = [
+    "__version__",
+    "Choice",
+    "Combination",
+    "Permutation",
+    "Universe",
+    "generate_permutation_group",
+    "variable_choice",
+    "enumerate_sets",
+]
 
 
-def enumerate_sets(universe: Universe, n: int) -> Generator[Set[int], None, None]:
+def enumerate_sets(universe: Universe, n: int) -> Generator[set[int], None, None]:
     """
     yield combinations
 

@@ -1,7 +1,7 @@
 import networkx as nx
 
 from pyzdd import Permutation, Universe, generate_permutation_group
-from pyzdd.graph import Graph, convert_to_raw_graph, get_vertex_order_by_bfs
+from pyzdd.graph import convert_to_raw_graph, get_vertex_order_by_bfs
 from pyzdd.structure import (
     construct_derivative_structures_with_sro,
     enumerate_binary_labelings_with_graph,

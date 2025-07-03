@@ -1,13 +1,11 @@
 #include <cassert>
 #include <iostream>
+#include <spec/universe.hpp>
 #include <string>
-#include <unordered_set>
-
 #include <tdzdd/DdSpec.hpp>
 #include <tdzdd/DdStructure.hpp>
-
-#include <spec/universe.hpp>
 #include <type.hpp>
+#include <unordered_set>
 
 using namespace pyzdd;
 using namespace pyzdd::universe;

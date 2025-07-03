@@ -2,6 +2,7 @@
 #define PYZDD_UNIVERSE_H
 
 #include <tdzdd/DdSpec.hpp>
+
 #include "../type.hpp"
 
 namespace pyzdd {

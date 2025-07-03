@@ -2,9 +2,9 @@ name: testing
 
 on:
   push:
-    branches: [main, develop]
+    branches: [main]
   pull_request:
-    branches: [main, develop]
+    branches: [main]
   workflow_dispatch:
 
 jobs:
@@ -12,15 +12,16 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: ["3.9", "3.10", "3.11", "3.12"]
+        python-version: ["3.9", "3.12"]
 
     steps:
       - uses: actions/checkout@v4
 
-      - name: Install dependencies
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y make gcc g++
+      - uses: awalsh128/cache-apt-pkgs-action@latest
+        with:
+          packages: make gcc g++
+          version: 1.0
+
       - name: Setup cmake
         uses: jwlawson/actions-setup-cmake@v2
         with:
@@ -45,4 +46,4 @@ jobs:
 
       - name: Test with pytest
         run: |
-          python -m pytest -v --cov=pyzdd --cov-config=setup.cfg --cov-report=xml tests/
+          python -m pytest -v --cov=pyzdd --cov-report=xml tests/

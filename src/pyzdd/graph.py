@@ -1,4 +1,4 @@
-from typing import Any, Dict, List, Tuple
+from typing import Any
 
 import networkx as nx
 from pyzdd_ import (
@@ -9,8 +9,18 @@ from pyzdd_ import (
     get_vertex_order_by_bfs,
 )
 
+__all__ = [
+    "convert_to_raw_graph",
+    "get_frontier_size",
+    "Edge",
+    "VertexGraphFrontierManager",
+    "Graph",
+    "GraphAuxiliary",
+    "get_vertex_order_by_bfs",
+]
 
-def convert_to_raw_graph(graph: nx.Graph) -> Tuple[List[List[Edge]], Dict[Any, int]]:
+
+def convert_to_raw_graph(graph: nx.Graph) -> tuple[list[list[Edge]], dict[Any, int]]:
     """
     convert nx.Graph to List[List[Edge]]
 
@@ -36,7 +46,7 @@ def convert_to_raw_graph(graph: nx.Graph) -> Tuple[List[List[Edge]], Dict[Any, i
     return graph_pb, mapping
 
 
-def get_frontier_size(raw_graph: List[List[Edge]], vertex_order: List[int]):
+def get_frontier_size(raw_graph: list[list[Edge]], vertex_order: list[int]):
     """
     return frontier size of DD for vertex-induced subgraphs
     """

@@ -1,10 +1,10 @@
 #ifndef PYZDD_STRUCTURE_ENUMERATION_H
 #define PYZDD_STRUCTURE_ENUMERATION_H
 
+#include <tdzdd/DdStructure.hpp>
 #include <utility>
 #include <vector>
 
-#include <tdzdd/DdStructure.hpp>
 #include "iterator.hpp"
 #include "permutation.hpp"
 #include "spec/choice.hpp"
